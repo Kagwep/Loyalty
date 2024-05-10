@@ -37,6 +37,18 @@ export const initPolkadotJs = async (): Promise<InitParams> => {
       testnet: true,
       faucetUrls: ['https://faucet.polkadot.io/'],
     };
+  } else if(chainId === 'contracts'){
+    chain = {
+      network: 'contracts',
+      name: 'Contracts on Rococo',
+      ss58Prefix: 42,
+      rpcUrls: ['wss://rococo-contracts-rpc.polkadot.io'],
+      explorerUrls: {
+        [SubstrateExplorer.PolkadotJs]: `https://polkadot.js.org/apps/?rpc=wss%3A%2F%2Frococo-contracts-rpc.polkadot.io`,
+      },
+      testnet: true,
+      faucetUrls: ['https://faucet.polkadot.io/'],
+    };
   } else {
     chain = getSubstrateChain(chainId);
   }

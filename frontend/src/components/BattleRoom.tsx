@@ -1,4 +1,4 @@
-import React,{useState} from 'react';
+import React,{useState,useEffect} from 'react';
 import { encodeAddress } from "@polkadot/util-crypto"
 import {
   SubstrateWalletPlatform,
@@ -11,6 +11,7 @@ import {
 } from "@scio-labs/use-inkathon"
 import { ContractIds } from "@/deployments/deployments";
 import CreateRoomModal from './CreateRoomModal';
+import toast from 'react-hot-toast'
 
 // Define TypeScript interface for a Battle Room
 interface BattleRoom {
@@ -23,10 +24,10 @@ interface BattleRoom {
 }
 
 interface BattleRoomProps {
-    rooms: BattleRoom[];
+
 }
 
-const BattleRoomList: React.FC<BattleRoomProps> = ({ rooms }) => {
+const BattleRoomList: React.FC<BattleRoomProps> = () => {
 
     const {
         activeChain,
@@ -39,12 +40,14 @@ const BattleRoomList: React.FC<BattleRoomProps> = ({ rooms }) => {
         isConnected 
       } = useInkathon()
 
-      console.log(ContractIds)
+     // console.log(ContractIds)
 
-      const { contract } = useRegisteredContract(ContractIds.Flipper)
-      console.log(contract)
+      const { contract } = useRegisteredContract(ContractIds.GameRoom)
+     // console.log(contract)
 
       const [isModalOpen, setModalOpen] = useState(false);
+      const [rooms, setRooms] = useState<BattleRoom[]>()
+      const [fetchIsLoading, setFetchIsLoading] = useState<boolean>()
 
        if (accounts){
             
@@ -52,7 +55,7 @@ const BattleRoomList: React.FC<BattleRoomProps> = ({ rooms }) => {
 
         //console.log(account)
 
-        console.log("gfffg",activeAccount)
+       // console.log("gfffg",activeAccount)
        }
 
        const testCall = async () => {
@@ -65,10 +68,10 @@ const BattleRoomList: React.FC<BattleRoomProps> = ({ rooms }) => {
             contract,
             "flip",
             undefined,
-            [false],
+     
           )
 
-          const shortenResult = decodeOutput(flipperOutcome, contract, "shorten")
+          const shortenResult = decodeOutput(flipperOutcome, contract, "flip")
 
           if (flipperOutcome.result.isErr && flipperOutcome.result.asErr.isModule) {
             const { docs, method, section } = api.registry.findMetaError(
@@ -82,21 +85,56 @@ const BattleRoomList: React.FC<BattleRoomProps> = ({ rooms }) => {
     
           
        }
+
+
+       const fetchRooms= async () => {
+        if (!contract || !api) return
+    
+        setFetchIsLoading(true)
+        try {
+          const result = await contractQuery(api, '', contract, 'getAllRooms')
+          const { output, isError, decodedOutput } = decodeOutput(result, contract, 'getAllRooms')
+          if (isError) throw new Error(decodedOutput)
+            console.log(output)
+          setRooms(output)
+    
+          // NOTE: Currently disabled until `typechain-polkadot` dependencies are upted to support ink! v5
+          // Alternatively: Fetch it with typed contract instance
+          // const typedResult = await typedContract.query.greet()
+          // console.log('Result from typed contract: ', typedResult.value)
+        } catch (e) {
+          console.error(e)
+          toast.error('Error while fetching Rooms. Try again…', {
+            style: {
+                color: '#000', // White text color
+                fontSize:10
+            }
+          });
+          setRooms([])
+        } finally {
+          setFetchIsLoading(false)
+        }
+      }
+      useEffect(() => {
+        fetchRooms()
+      }, [contract])
       
     return (
         <div className="max-w-screen-lg mx-auto  shadow-lg rounded-lg p-4">
             <h2 className="text-xl font-bold text-slate-100 mb-4 ">Battle Rooms</h2>
             <div>
                 <button className="bg-purple-950 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded text-2xl" onClick={() => setModalOpen(true)}>Create Room </button>
-                <CreateRoomModal isOpen={isModalOpen} onClose={() => setModalOpen(false)} />
+                <CreateRoomModal isOpen={isModalOpen} onClose={() => setModalOpen(false)} fetchRooms={fetchRooms} />
             </div>
             <div className="bg-cover bg-center" style={{ backgroundImage: 'url("https://res.cloudinary.com/dydj8hnhz/image/upload/v1714890212/hggdym2eguf38jws7lib.jpg")' }}>
-                {rooms.map((room) => (
+                {rooms?.map((room) => (
                     <div key={room.id} className="p-4 bg-white bg-opacity-80 rounded-md my-2 flex justify-between items-center">
                         <div>
                             <h3 className="font-semibold text-2xl ">{room.name}</h3>
                             <p className='text-2xl'>Status: <span className={`text-${room.status === 'Active' ? 'green' : 'yellow'}-500`}>{room.status}</span></p>
                             <p className='text-2xl'>Players: {room.players}</p>
+                            <p className='text-2xl text-purple-950'> {room.description}</p>
+                            <p className='text-2xl text-red-600'> <span className='text-blue-700'>Max players</span> {room.maxPlayers}</p>
                         </div>
                         <button className="px-4 py-2 bg-slate-950 text-white rounded hover:bg-slate-600 transition duration-300 text-2xl" onClick={testCall}>
                             Join Room

@@ -1,11 +1,54 @@
 import React, { useState } from 'react';
+import {
+    SubstrateWalletPlatform,
+    allSubstrateWallets,
+    isWalletInstalled,
+    useInkathon,
+    contractQuery,
+    decodeOutput,
+    useRegisteredContract,
+  } from "@scio-labs/use-inkathon"
+  import { ContractIds } from "@/deployments/deployments";
+import toast from 'react-hot-toast';
+import { contractTxWithToast } from '@/utils/contract-tx-with-toast'
 
 interface Props {
     isOpen: boolean;
     onClose: () => void;
+    fetchRooms:() => void;
 }
 
-const CreateRoomModal: React.FC<Props> = ({ isOpen, onClose }) => {
+const CreateRoomModal: React.FC<Props> = ({ isOpen, onClose,fetchRooms }) => {
+
+    const {
+        activeChain,
+        connect,
+        disconnect,
+        activeAccount,
+        accounts,
+        setActiveAccount,
+        api,
+        isConnected,
+        activeSigner 
+      } = useInkathon()
+
+     // console.log(ContractIds)
+
+      const { contract } = useRegisteredContract(ContractIds.GameRoom)
+      //onsole.log(contract)
+
+      const [isModalOpen, setModalOpen] = useState(false);
+
+       if (accounts){
+            
+        const account = accounts[0];
+
+        //console.log(account)
+
+       // console.log("gfffg",activeAccount)
+       }
+
+
     const [formData, setFormData] = useState({
         name: '',
         status: '',
@@ -22,7 +65,28 @@ const CreateRoomModal: React.FC<Props> = ({ isOpen, onClose }) => {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         // Submit logic here, you might need to adjust based on how you're interacting with your blockchain or backend
-        console.log(formData);
+        console.log(".....",formData);
+
+        if (!activeAccount || !contract || !activeSigner || !api) {
+            toast.error('Wallet not connected. Try again…', {
+                style: {
+                    color: '#000', // White text color
+                    fontSize:10
+                }
+              })
+            return
+          }
+
+          try {
+            await contractTxWithToast(api, activeAccount.address, contract, 'createRoom', {}, [
+                formData.name,formData.status,parseInt(formData.maxPlayers.toString()),formData.description,formData.roomId,formData.creatorName
+            ])
+          } catch (e) {
+            console.error(e)
+          } finally {
+            fetchRooms()
+          }
+
         onClose(); // Close modal after submission
     };
 

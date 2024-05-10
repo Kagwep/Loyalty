@@ -8,6 +8,7 @@ import {
 } from "@scio-labs/use-inkathon"
 import { toast } from "react-hot-toast"
 
+
 type ContractTxWithToastParams = Parameters<typeof contractTx>
 
 export const contractTxWithToast = async (
@@ -17,7 +18,13 @@ export const contractTxWithToast = async (
     loading: "Sending transaction…",
     success: (result) => <ContractTxSuccessToast {...result} />,
     error: (result) => <ContractTxErrorToast {...result} />,
-  })
+  },
+  {
+    style: {
+        fontSize:13
+    }
+  }
+)
 }
 
 export const ContractTxSuccessToast: FC<ContractTxResult> = ({

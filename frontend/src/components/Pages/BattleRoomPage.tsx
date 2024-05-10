@@ -12,7 +12,7 @@ const BattleRoomPage = () => {
   return (
     <div>
     <Navbar />
-      <BattleRoomList rooms={battleRooms}/>
+      <BattleRoomList />
     <Footer />
 </div>
   )

@@ -43,20 +43,3 @@ function App() {
 export default App
 
 
-// link Content
-
-// <div className="relative flex min-h-screen flex-col">
-// <header className="sticky top-0 z-50 w-full p-2">
-//   <div className="flex items-center justify-end">
-//     <ConnectButton />
-//   </div>
-// </header>
-
-// <main className="flex flex-1 flex-col items-center justify-between pt-10">
-//   <LinkContractInteractions />
-// </main>
-
-// <div className="w-full py-2">
-//   <Footer />
-// </div>
-// </div>
