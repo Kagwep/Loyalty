@@ -1,0 +1,47 @@
+name: Contract check
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+
+jobs:
+  contract-check:
+    strategy:
+      matrix:
+        os: ["ubuntu-latest"]
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        working-directory: contracts/src/link
+    steps:
+      - name: Install Rust toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: stable
+          override: true
+
+      - name: Install Rust nightly toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: stable
+          override: true
+
+      - uses: actions/checkout@v4
+
+      - name: Cache
+        uses: Swatinem/rust-cache@v2
+
+      - name: Install cargo-contract
+        uses: baptiste0928/cargo-install@21a18ba3bf4a184d1804e8b759930d3471b1c941 # v2.2.0
+        with:
+          crate: cargo-contract
+          version: "4.0.0-rc.1"
+
+      - name: Run contract check
+        run: |
+          cargo contract check
