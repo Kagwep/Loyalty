@@ -82,6 +82,18 @@ const CreateRoomModal: React.FC<Props> = ({ isOpen, onClose,fetchRooms,setRoom, 
         // Submit logic here, you might need to adjust based on how you're interacting with your blockchain or backend
         console.log(".....",formData);
 
+        const allFieldsFilled = Object.values(formData).every(value => value !== '');
+        
+        if (!allFieldsFilled) {
+            toast.error('Confirm all the fields are filled and try again…', {
+                style: {
+                    color: '#000', // White text color
+                    fontSize:10
+                }
+              })
+            return;
+        }
+
         if (!activeAccount || !contract || !activeSigner || !api) {
             toast.error('Wallet not connected. Try again…', {
                 style: {
@@ -93,11 +105,15 @@ const CreateRoomModal: React.FC<Props> = ({ isOpen, onClose,fetchRooms,setRoom, 
           }
 
           try {
-            let result = await contractTxWithToast(api, activeAccount.address, contract, 'createRoom', {}, [
+            let response = await contractTxWithToast(api, activeAccount.address, contract, 'createRoom', {}, [
                 formData.name,formData.status,parseInt(formData.maxPlayers.toString()),formData.description,formData.roomId,formData.creatorName
             ])
 
-            console.log(result)
+            const { dryResult, result: responseResult, ...rest } = response;
+
+            if (dryResult.result.isOk) {
+                handleCreateRoom()
+            } 
             
           } catch (e) {
             console.error(e)

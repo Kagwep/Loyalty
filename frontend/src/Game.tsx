@@ -26,11 +26,7 @@ function Game() {
       setPlayersIdentity("");
     }, []);
   
-    useEffect(() => {
-      // const username = prompt("Username");
-      // setUsername(username);
-      // socket.emit("username", username);
-  
+    useEffect(() => {  
       socket.on("opponentJoined", (roomData) => {
         console.log("roomData", roomData)
         setPlayers(roomData.players);

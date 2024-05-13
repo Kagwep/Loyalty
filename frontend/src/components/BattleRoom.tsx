@@ -1,4 +1,4 @@
-import React,{useState,useEffect} from 'react';
+import React,{useState,useEffect,useCallback} from 'react';
 import { encodeAddress } from "@polkadot/util-crypto"
 import {
   SubstrateWalletPlatform,
@@ -14,6 +14,8 @@ import CreateRoomModal from './CreateRoomModal';
 import toast from 'react-hot-toast';
 import { Link } from 'react-router-dom';
 import { Players } from '@/utils/commonGame';
+import Canvas from "@/components/Game/Logic/Loyalty";
+import socket from '@/socket';
 // Define TypeScript interface for a Battle Room
 interface BattleRoom {
     id: number;           // Unique identifier for the battle room
@@ -54,13 +56,20 @@ const BattleRoomList: React.FC<BattleRoomProps> = () => {
       const [rooms, setRooms] = useState<BattleRoom[]>()
       const [fetchIsLoading, setFetchIsLoading] = useState<boolean>()
 
-      const [username, setUsername] = useState("");
+      const [username, setUsername] = useState("musa");
       const [usernameSubmitted, setUsernameSubmitted] = useState(false);
     
       const [room, setRoom] = useState("");
       const [orientation, setOrientation] = useState("");
       const [players, setPlayers] = useState<Players[]>([]);
       const [players_identity, setPlayersIdentity] = useState<string>("");
+
+      const cleanup = useCallback(() => {
+        setRoom("");
+        setOrientation("");
+        setPlayers([]);
+        setPlayersIdentity("");
+      }, []);
 
        if (accounts){
             
@@ -131,8 +140,29 @@ const BattleRoomList: React.FC<BattleRoomProps> = () => {
       useEffect(() => {
         fetchRooms()
       }, [contract])
+
+      useEffect(() => {  
+        socket.on("opponentJoined", (roomData: { players: React.SetStateAction<Players[]>; }) => {
+          console.log("roomData", roomData)
+          setPlayers(roomData.players);
+        });
+      }, []);
       
     return (
+      <>
+      {room ? (
+       <>
+            <Canvas
+              room={room}
+              orientation={orientation}
+              username={username}
+              players={players}
+              player_identity={players_identity}
+              // the cleanup function will be used by Game to reset the state when a game is over
+              cleanup={cleanup}
+            />
+       </>
+      ):(
         <div className="max-w-screen-lg mx-auto  shadow-lg rounded-lg p-4">
             <h2 className="text-xl font-bold text-slate-100 mb-4 ">Battle Rooms</h2>
             <div>
@@ -166,6 +196,9 @@ const BattleRoomList: React.FC<BattleRoomProps> = () => {
                 ))}
             </div>
         </div>
+
+      )};
+      </>
     );
 };
 

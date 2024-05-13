@@ -255,10 +255,7 @@ mod loyalty_marketplace {
         
             Ok(())
         }
-        
-        
-        
-        
+            
     }
 
     #[cfg(all(test, feature = "e2e-tests"))]
