@@ -5,9 +5,10 @@ import '../css/ContentHero.scss';
 
 
 const ContentHero = () => {
+
     const button_info = {
         text: 'Play now',
-        link_text: '/play', 
+        link_text: '/battle-room', 
         type: 'price-button' 
     }
 

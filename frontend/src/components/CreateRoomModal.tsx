@@ -11,14 +11,20 @@ import {
   import { ContractIds } from "@/deployments/deployments";
 import toast from 'react-hot-toast';
 import { contractTxWithToast } from '@/utils/contract-tx-with-toast'
+import { Players } from '@/utils/commonGame';
+import socket from '@/socket';
 
 interface Props {
     isOpen: boolean;
     onClose: () => void;
     fetchRooms:() => void;
+    setRoom:React.Dispatch<React.SetStateAction<string>>;
+    setOrientation:React.Dispatch<React.SetStateAction<string>>;
+    setPlayers:React.Dispatch<React.SetStateAction<Players[]>>;
+    setPlayersIdentity:React.Dispatch<React.SetStateAction<string>>;
 }
 
-const CreateRoomModal: React.FC<Props> = ({ isOpen, onClose,fetchRooms }) => {
+const CreateRoomModal: React.FC<Props> = ({ isOpen, onClose,fetchRooms,setRoom, setOrientation, setPlayers,setPlayersIdentity }) => {
 
     const {
         activeChain,
@@ -47,7 +53,16 @@ const CreateRoomModal: React.FC<Props> = ({ isOpen, onClose,fetchRooms }) => {
 
        // console.log("gfffg",activeAccount)
        }
-
+       
+    const handleCreateRoom = () => {
+        socket.emit("createRoom", (r: React.SetStateAction<string>) => {
+          console.log(r);
+          setRoom(r);
+          setOrientation("white");
+          setPlayersIdentity('player-1')
+    
+        });
+      };
 
     const [formData, setFormData] = useState({
         name: '',
@@ -78,9 +93,12 @@ const CreateRoomModal: React.FC<Props> = ({ isOpen, onClose,fetchRooms }) => {
           }
 
           try {
-            await contractTxWithToast(api, activeAccount.address, contract, 'createRoom', {}, [
+            let result = await contractTxWithToast(api, activeAccount.address, contract, 'createRoom', {}, [
                 formData.name,formData.status,parseInt(formData.maxPlayers.toString()),formData.description,formData.roomId,formData.creatorName
             ])
+
+            console.log(result)
+            
           } catch (e) {
             console.error(e)
           } finally {

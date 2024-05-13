@@ -11,8 +11,9 @@ import {
 } from "@scio-labs/use-inkathon"
 import { ContractIds } from "@/deployments/deployments";
 import CreateRoomModal from './CreateRoomModal';
-import toast from 'react-hot-toast'
-
+import toast from 'react-hot-toast';
+import { Link } from 'react-router-dom';
+import { Players } from '@/utils/commonGame';
 // Define TypeScript interface for a Battle Room
 interface BattleRoom {
     id: number;           // Unique identifier for the battle room
@@ -21,11 +22,15 @@ interface BattleRoom {
     players: number;      // Current number of players in the room
     maxPlayers: number;   // Maximum number of players the room can accommodate
     description: string;  // Description of the battle room
+    roomId:string;
+    participants:string[];
 }
 
 interface BattleRoomProps {
 
 }
+
+
 
 const BattleRoomList: React.FC<BattleRoomProps> = () => {
 
@@ -48,6 +53,14 @@ const BattleRoomList: React.FC<BattleRoomProps> = () => {
       const [isModalOpen, setModalOpen] = useState(false);
       const [rooms, setRooms] = useState<BattleRoom[]>()
       const [fetchIsLoading, setFetchIsLoading] = useState<boolean>()
+
+      const [username, setUsername] = useState("");
+      const [usernameSubmitted, setUsernameSubmitted] = useState(false);
+    
+      const [room, setRoom] = useState("");
+      const [orientation, setOrientation] = useState("");
+      const [players, setPlayers] = useState<Players[]>([]);
+      const [players_identity, setPlayersIdentity] = useState<string>("");
 
        if (accounts){
             
@@ -124,7 +137,15 @@ const BattleRoomList: React.FC<BattleRoomProps> = () => {
             <h2 className="text-xl font-bold text-slate-100 mb-4 ">Battle Rooms</h2>
             <div>
                 <button className="bg-purple-950 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded text-2xl" onClick={() => setModalOpen(true)}>Create Room </button>
-                <CreateRoomModal isOpen={isModalOpen} onClose={() => setModalOpen(false)} fetchRooms={fetchRooms} />
+                <CreateRoomModal
+                  isOpen={isModalOpen}
+                  onClose={() => setModalOpen(false)}
+                  fetchRooms={fetchRooms}
+                  setRoom={setRoom}
+                  setOrientation={setOrientation}
+                  setPlayers={setPlayers}
+                  setPlayersIdentity={setPlayersIdentity} 
+                  />
             </div>
             <div className="bg-cover bg-center" style={{ backgroundImage: 'url("https://res.cloudinary.com/dydj8hnhz/image/upload/v1714890212/hggdym2eguf38jws7lib.jpg")' }}>
                 {rooms?.map((room) => (
@@ -136,9 +157,11 @@ const BattleRoomList: React.FC<BattleRoomProps> = () => {
                             <p className='text-2xl text-purple-950'> {room.description}</p>
                             <p className='text-2xl text-red-600'> <span className='text-blue-700'>Max players</span> {room.maxPlayers}</p>
                         </div>
-                        <button className="px-4 py-2 bg-slate-950 text-white rounded hover:bg-slate-600 transition duration-300 text-2xl" onClick={testCall}>
-                            Join Room
-                        </button>
+                        <Link to={`/play/${room.roomId}`}>
+                          <button className="px-4 py-2 bg-slate-950 text-white rounded hover:bg-slate-600 transition duration-300 text-2xl" >
+                              Join Room
+                          </button>
+                        </Link>
                     </div>
                 ))}
             </div>
