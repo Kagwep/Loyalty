@@ -7,6 +7,7 @@ interface Player {
     name: string;
     points: number;
     avatarUrl: string;
+    
 }
 
 interface LeaderboardProps {

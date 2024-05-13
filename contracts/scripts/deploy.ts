@@ -18,7 +18,7 @@ const main = async () => {
   const initParams = await initPolkadotJs();
   const { api, chain, account } = initParams;
 
-  // Deploy greeter contract
+
   const { abi, wasm } = await getDeploymentData('link');
   const contract = await deployContract(api, account, abi, wasm, 'new', []);
 
