@@ -10,12 +10,12 @@ import '../css/item.css'
 import creator from '../assets/images/player.png'
 import item from '../assets/images/item.jfif'
 import WalletAddress from './Customs/WAlletAddress';
-
-import Box from '@mui/material/Box';
+import CssBaseline from "@mui/material/CssBaseline";
 import Tab from '@mui/material/Tab';
 import TabContext from '@mui/lab/TabContext';
 import TabList from '@mui/lab/TabList';
 import TabPanel from '@mui/lab/TabPanel';
+import Box from "@mui/material/Box";
 
 interface Player {
   playerAddress: string;

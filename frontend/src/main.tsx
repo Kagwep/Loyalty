@@ -9,6 +9,9 @@ import "./global.css"
 import { Toaster } from "react-hot-toast"
 import { BrowserRouter,Route,Routes } from 'react-router-dom'
 
+
+
+
 const queryClient = new QueryClient()
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
@@ -22,7 +25,9 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
               deployments={Promise.resolve(getDeployments())}
             >
               <>
-                <App />
+
+                    <App />
+                   
                 <Toaster position="top-center" reverseOrder={false} />
               </>
             </UseInkathonProvider>
