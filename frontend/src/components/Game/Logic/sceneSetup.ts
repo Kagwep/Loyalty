@@ -117,6 +117,8 @@ export class GameScene {
             assets.setAssetsMeshNameToIndex(meshes);
         }
 
+        assets.setPiecesStartingPositions({player_identity:'player_one'});
+
         assets.cavalry[0].model.isPickable = false;
 
 

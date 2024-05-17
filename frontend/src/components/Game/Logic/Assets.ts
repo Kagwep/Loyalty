@@ -10,6 +10,7 @@ export interface ArmyUnit {
 export interface LoyaltyAssets {
     mesh_name: string,
     index: number,
+    mesh: AbstractMesh
 }
 
 
@@ -28,6 +29,8 @@ export class Assets {
 
     public loyalGameplayAssets: AbstractMesh[] = [];
 
+    public loyalGameplayAssetsHome: Map<string, AbstractMesh> = new Map();
+
     public infantryThreatArea: Mesh | undefined;
     public cavalryThreatArea: Mesh | undefined;
     public archersThreatArea: Mesh | undefined;
@@ -45,12 +48,15 @@ export class Assets {
 
     public sounds: Map<string, Sound> | undefined;
 
+    public pieces:Map<string,  Mesh> = new Map();
+
     
     private scene: Scene;
     private assetsManager: AssetsManager;
     private soundAssetsManager: AssetsManager;
 
     constructor(scene: Scene) {
+
         this.scene = scene;
         this.assetsManager = new AssetsManager(scene);
         this.soundAssetsManager = new AssetsManager(scene);
@@ -58,12 +64,12 @@ export class Assets {
 
         this.sounds = new Map<string, Sound>();
 
+        this.setLoyalPieces();
+
         
         this.assetsManager = new AssetsManager(scene);
         this.soundAssetsManager = new AssetsManager(scene);
         this.setupSoundAssetTasks();
-
-
         
         this.createMaterials(scene);
 
@@ -73,11 +79,41 @@ export class Assets {
 
     }
 
+    public setLoyalPieces(){
+
+        const units = ["Cavalry", "Infantry", "Archers", "Artillery"];
+
+        units.forEach((unit) => {
+
+
+            for (let i = 1; i <= 4; i++) {
+                const meshName = `${unit}Piece${i}`;
+                const sphere = MeshBuilder.CreateSphere(meshName, { diameter: 2 }, this.scene) as Mesh;
+                sphere.position.x = -20 + i * 5;  // Adjusting position for demo purposes
+                sphere.position.y = 4;
+
+                const threatMaterialSphere = new StandardMaterial("threatMaterialSphere", this.scene);
+                threatMaterialSphere.diffuseColor = new Color3(1, 0, 0); // Red
+                threatMaterialSphere.alpha = 0.5; // Semi-transparent
+
+                sphere.material = threatMaterialSphere;
+                this.pieces.set(meshName, sphere);
+            }
+
+           
+        });
+
+    }
+
+    public getLoyalPieceByName(name: string): Mesh | undefined {
+        return this.pieces.get(name);
+    }
+
     public async setupAssetTasks() {
-        await this.createAssetTask("cavalry.glb", "cavalry");
-        await this.createAssetTask("infantry.glb", "infantry");
-        await this.createAssetTask("archers.glb", "archers");
-        await this.createAssetTask("artillery.glb", "artillery");
+        await this.createAssetTask("armybanner.glb", "cavalry");
+        await this.createAssetTask("armybanner.glb", "infantry");
+        await this.createAssetTask("armybanner.glb", "archers");
+        await this.createAssetTask("armybanner.glb", "artillery");
     }
 
     private setupSoundAssetTasks() {
@@ -150,12 +186,21 @@ export class Assets {
     private createUnits(baseMesh: AbstractMesh | undefined, unitArray: ArmyUnit[], type: string, strength: number) {
 
         if (baseMesh) {
+            
             for (let i = 1; i <= 4; i++) {
+                const newBaseMesh = baseMesh.clone(`${type}Unit${i}`, null, false) as AbstractMesh
+                const meshName = `${type}Piece${i}`;
+                const baseMeshParent = this.getLoyalPieceByName(meshName);
+
+                if (baseMeshParent){
+                    newBaseMesh.parent = baseMeshParent;
+                }
+
                 unitArray.push({
                     name: `${type} Unit ${i}`,
                     army_type: type,
                     strength: strength,
-                    model: baseMesh.clone(`${type}Unit${i}`, null, false) as AbstractMesh
+                    model: newBaseMesh,
                 });
             }
         }
@@ -213,7 +258,6 @@ export class Assets {
             
         };
 
-
         const threatArea = MeshBuilder.CreateDisc(name, options, scene);
         threatArea.material = material;
         threatArea.rotation.x = Math.PI / 2; // Rotate to lay flat
@@ -227,7 +271,7 @@ export class Assets {
 
     public setAssetsMeshNameToIndex(meshes: AbstractMesh[]) {
         meshes.forEach((mesh, index) => {
-            const asset = { mesh_name: mesh.name, index: index };
+            const asset = { mesh_name: mesh.name, index: index ,mesh: mesh};
             this.meshNameToIndex?.set(mesh.name, asset);
         });
         this.loyalGameplayAssets = meshes;
@@ -242,13 +286,72 @@ export class Assets {
             'ruinspalace', 'whitepalace', 'darkpalace', 'fortvillage', 'fort', 'plains', 'highlandstopl'
         ];
 
+        const startingPositionsReferceAssets = ['farm1', 'palace1', 'memorial', 'church', 'whitepalace', 'darkpalace', 'fortvillage', 'plains']
+
         this.loyalGameplayAssets.forEach(mesh => {
             if (namesToDisable.includes(mesh.name)) {
                 mesh.isVisible = false;
                 mesh.isPickable = false; // Ensure it's not pickable
+
+                if (startingPositionsReferceAssets.includes(mesh.name)){
+                    this.loyalGameplayAssetsHome.set(mesh.name, mesh)
+                }
             }
         });
     }
+
+    public getLoyalGameplayAssetsPositions(meshName:string){
+
+        const Assetmesh = this.meshNameToIndex.get(meshName)
+
+        if (Assetmesh){
+            return Assetmesh.mesh.absolutePosition
+        }
+
+        return null
+
+        
+    }
+
+    public setPiecesStartingPositions(player:any){
+
+        const meshesToReferenceSetOne = [
+            'whitepalace', 'darkpalace', 'fortvillage', 'plains'
+        ];
+
+        const meshesToReferenceSetTwo = [
+           'farm1', 'palace1', 'memorial', 'church', 
+        ];
+
+        const units = ["Cavalry", "Infantry", "Archers", "Artillery"];
+
+
+        units.forEach((unit) => {
+            for (let i = 1; i <= 4; i++) {
+
+                const meshName = `${unit}Piece${i}`;
+                
+                const piece = this.getLoyalPieceByName(meshName);
+
+                const startPositionMesh = this.loyalGameplayAssetsHome.get(
+                    player.identity === 'player_one' ? meshesToReferenceSetTwo[i] : meshesToReferenceSetOne[i]
+                  );
+                  
+                  if (startPositionMesh && piece) {
+                    piece.position = startPositionMesh.absolutePosition.clone();
+                    piece.position.x += i + 5;
+                  }
+                  
+            }
+        })
+
+        
+
+
+    }
+
+  
+
   
 
 }
