@@ -12,6 +12,8 @@ export class GameScene {
     private navigation!: RecastJSPlugin;
     private navMesh: Mesh | null = null;
     recast: any;
+    public unitTokenUris: string[] = [];
+    public assets!: Assets;
 
     constructor(canvasElement:  HTMLCanvasElement) {
 
@@ -26,6 +28,7 @@ export class GameScene {
             this.createObjects();
             this.addListeners();
         });
+
     }
 
     private async initRecast(): Promise<void> {
@@ -50,7 +53,14 @@ export class GameScene {
         let unitpositionZ = 0;
         let unitpositionX = 0;
 
-        const gameGUI = new GUI(this.scene);
+        this. unitTokenUris = [
+            'https://hambre.infura-ipfs.io/ipfs/QmWjuQ5fitcQzmvJ2zYbg9Ey8arMCAkwbzaofhRKr7ewSM',
+            'https://hambre.infura-ipfs.io/ipfs/QmZoczszkuFaxjufK9yKPdA6JPsw6nyeM46ghmMW1htLvi',
+            'https://hambre.infura-ipfs.io/ipfs/QmYJaPth7s83t3URg4PM9SUFAqBrrKMTzSWa3xchDcEjT4',
+            'https://hambre.infura-ipfs.io/ipfs/QmW1EP1AkVZ82GfeKsY9b1211w5a5nhXMSAGQUU6JsbY6E'
+        ]
+
+        const gameGUI = new GUI(this.scene, this.unitTokenUris);
 
         const box = MeshBuilder.CreateBox("box", { size: 0.05 }, this.scene) as Mesh;
         box.position.x = 1.5;
@@ -109,6 +119,8 @@ export class GameScene {
         
         const assets = new Assets(this.scene);
 
+        assets.setUnitUris(this.unitTokenUris);
+
         await assets.setupAssetTasks();
 
         await assets.initialize();
@@ -117,44 +129,23 @@ export class GameScene {
             assets.setAssetsMeshNameToIndex(meshes);
         }
 
-        assets.setPiecesStartingPositions({player_identity:'player_one'});
+        assets.setPiecesStartingPositions({identity:'player_one'});
 
         assets.cavalry[0].model.isPickable = false;
 
 
-        assets.cavalry[0].model.parent = sphere;
+        
 
         console.log(assets.cavalry[0].strength)
     
-        assets.cavalry[0].model.unfreezeWorldMatrix();
-
-        //assets.cavalry[0].model.position.y = sphere.position.y;
-        const cavalryMaterial = new StandardMaterial("cavalryMaterial1", this.scene);
-
-        const cavalryTexture = new Texture("https://hambre.infura-ipfs.io/ipfs/QmR8ZXT5ka5wpY8ub8R1mQTLtb89Fxe9AEDdu5LR57jPp6", this.scene);
-
-        // Set the diffuse texture using a URL
-        cavalryMaterial.diffuseTexture = cavalryTexture;
-
-
-        assets.cavalry[0].model.material= cavalryMaterial;
 
         console.log(assets.cavalry[0].model.isEnabled());
 
         console.log(assets.meshNameToIndex.get('loyalpalace'));
 
-        assets.cavalry[0].model.getChildMeshes(false, (node) => {
-            if (node instanceof Mesh) {
-                node.material = cavalryMaterial;
-                return true;  
-            }
-            return false;  
-        });
-        
-       
         
         // Apply the material to the cavalry model
-       sphere.material = cavalryMaterial
+     
 
         console.log(sphere.material)
 
@@ -179,6 +170,8 @@ export class GameScene {
             }
 
         }
+
+        this.assets = assets;
           
 
         this.scene.onBeforeRenderObservable.add(() => {
@@ -226,7 +219,7 @@ export class GameScene {
     private addListeners(): void {
         this.scene.onPointerDown = (evt, pickResult) => {
             console.log(pickResult.pickedMesh);
-            if (pickResult.hit && pickResult.pickedMesh && (pickResult.pickedMesh.name === "sphere" || pickResult.pickedMesh.name === "box" )) {
+            if (pickResult.hit && pickResult.pickedMesh && (pickResult.pickedMesh.name === "sphere" ||  this.assets.pieces.has(pickResult.pickedMesh.name))) {
                 this.selectedMesh = pickResult.pickedMesh as Mesh;
             } else if (pickResult.hit && pickResult.pickedMesh === this.navMesh && this.selectedMesh) {
                 console.log(pickResult.pickedPoint!)

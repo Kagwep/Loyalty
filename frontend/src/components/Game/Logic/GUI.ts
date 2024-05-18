@@ -5,12 +5,14 @@ import { AdvancedDynamicTexture, CheckboxGroup, Control, Grid, RadioGroup, Selec
 export class GUI {
     private scene: Scene;
     private advancedTexture: AdvancedDynamicTexture;
+    private tokenUris:string[] = [];
     
 
-    constructor(scene: Scene) {
+    constructor(scene: Scene,tokenUris: string []) {
         this.scene = scene;
         this.advancedTexture = AdvancedDynamicTexture.CreateFullscreenUI("UI");
 
+        this.tokenUris = tokenUris;
   
         this.createSidePanel();
         this.createRightPanel();
@@ -26,7 +28,7 @@ export class GUI {
         this.advancedTexture.addControl(sidePanel);
 
         const units = ["Cavalry", "Infantry", "Archers", "Artillery"];
-        units.forEach(unit => {
+        units.forEach((unit,index) => {
             const container = new Rectangle();
             container.width = "100px";
             container.height = "120px"; // Increased height to accommodate the image and the button
@@ -35,7 +37,7 @@ export class GUI {
             sidePanel.addControl(container);
 
             // Create an image placeholder
-            const image = new Image(`${unit}_img`, "https://hambre.infura-ipfs.io/ipfs/QmR8ZXT5ka5wpY8ub8R1mQTLtb89Fxe9AEDdu5LR57jPp6");
+            const image = new Image(`${unit}_img`, `${this.tokenUris[index]}`);
             image.width = "80px";
             image.height = "80px";
             image.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
