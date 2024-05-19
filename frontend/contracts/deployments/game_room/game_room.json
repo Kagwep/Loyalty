@@ -1,0 +1,705 @@
+{
+  "source": {
+    "hash": "0x7eed6d549e3c45b3d4d98ddfcd6a0b9a79d016a244c9333a61b780c6ae58f603",
+    "language": "ink! 5.0.0",
+    "compiler": "rustc 1.76.0",
+    "build_info": {
+      "build_mode": "Debug",
+      "cargo_contract_version": "4.1.1",
+      "rust_toolchain": "stable-x86_64-unknown-linux-gnu",
+      "wasm_opt_settings": {
+        "keep_debug_symbols": false,
+        "optimization_passes": "Z"
+      }
+    }
+  },
+  "contract": {
+    "name": "game_room",
+    "version": "0.1.0",
+    "authors": [
+      "[your_name] <[your_email]>"
+    ]
+  },
+  "image": null,
+  "spec": {
+    "constructors": [
+      {
+        "args": [],
+        "default": false,
+        "docs": [
+          "Constructor that initializes the `bool` value to the given `init_value`."
+        ],
+        "label": "new",
+        "payable": false,
+        "returnType": {
+          "displayName": [
+            "ink_primitives",
+            "ConstructorResult"
+          ],
+          "type": 6
+        },
+        "selector": "0x9bae9d5e"
+      }
+    ],
+    "docs": [],
+    "environment": {
+      "accountId": {
+        "displayName": [
+          "AccountId"
+        ],
+        "type": 13
+      },
+      "balance": {
+        "displayName": [
+          "Balance"
+        ],
+        "type": 16
+      },
+      "blockNumber": {
+        "displayName": [
+          "BlockNumber"
+        ],
+        "type": 2
+      },
+      "chainExtension": {
+        "displayName": [
+          "ChainExtension"
+        ],
+        "type": 19
+      },
+      "hash": {
+        "displayName": [
+          "Hash"
+        ],
+        "type": 17
+      },
+      "maxEventTopics": 4,
+      "staticBufferSize": 16384,
+      "timestamp": {
+        "displayName": [
+          "Timestamp"
+        ],
+        "type": 18
+      }
+    },
+    "events": [],
+    "lang_error": {
+      "displayName": [
+        "ink",
+        "LangError"
+      ],
+      "type": 8
+    },
+    "messages": [
+      {
+        "args": [
+          {
+            "label": "name",
+            "type": {
+              "displayName": [
+                "String"
+              ],
+              "type": 3
+            }
+          },
+          {
+            "label": "status",
+            "type": {
+              "displayName": [
+                "String"
+              ],
+              "type": 3
+            }
+          },
+          {
+            "label": "max_players",
+            "type": {
+              "displayName": [
+                "u32"
+              ],
+              "type": 2
+            }
+          },
+          {
+            "label": "description",
+            "type": {
+              "displayName": [
+                "String"
+              ],
+              "type": 3
+            }
+          },
+          {
+            "label": "room_id",
+            "type": {
+              "displayName": [
+                "String"
+              ],
+              "type": 3
+            }
+          },
+          {
+            "label": "creator_name",
+            "type": {
+              "displayName": [
+                "String"
+              ],
+              "type": 3
+            }
+          }
+        ],
+        "default": false,
+        "docs": [],
+        "label": "create_room",
+        "mutates": true,
+        "payable": false,
+        "returnType": {
+          "displayName": [
+            "ink",
+            "MessageResult"
+          ],
+          "type": 6
+        },
+        "selector": "0xcdb2bc30"
+      },
+      {
+        "args": [
+          {
+            "label": "room_id",
+            "type": {
+              "displayName": [
+                "String"
+              ],
+              "type": 3
+            }
+          },
+          {
+            "label": "participant_name",
+            "type": {
+              "displayName": [
+                "String"
+              ],
+              "type": 3
+            }
+          }
+        ],
+        "default": false,
+        "docs": [],
+        "label": "add_participant",
+        "mutates": true,
+        "payable": false,
+        "returnType": {
+          "displayName": [
+            "ink",
+            "MessageResult"
+          ],
+          "type": 9
+        },
+        "selector": "0x0799f208"
+      },
+      {
+        "args": [
+          {
+            "label": "index",
+            "type": {
+              "displayName": [
+                "u32"
+              ],
+              "type": 2
+            }
+          }
+        ],
+        "default": false,
+        "docs": [
+          " A message that can be called on instantiated contracts.",
+          " This one flips the value of the stored `bool` from `true`",
+          " to `false` and vice versa."
+        ],
+        "label": "get_room_by_index",
+        "mutates": false,
+        "payable": false,
+        "returnType": {
+          "displayName": [
+            "ink",
+            "MessageResult"
+          ],
+          "type": 11
+        },
+        "selector": "0x041a8fa8"
+      },
+      {
+        "args": [
+          {
+            "label": "room_id",
+            "type": {
+              "displayName": [
+                "String"
+              ],
+              "type": 3
+            }
+          }
+        ],
+        "default": false,
+        "docs": [
+          " Simply returns the current value of our `bool`."
+        ],
+        "label": "get_room_by_id",
+        "mutates": false,
+        "payable": false,
+        "returnType": {
+          "displayName": [
+            "ink",
+            "MessageResult"
+          ],
+          "type": 11
+        },
+        "selector": "0x8476183f"
+      },
+      {
+        "args": [],
+        "default": false,
+        "docs": [],
+        "label": "get_all_rooms",
+        "mutates": false,
+        "payable": false,
+        "returnType": {
+          "displayName": [
+            "ink",
+            "MessageResult"
+          ],
+          "type": 12
+        },
+        "selector": "0xdf4f4716"
+      }
+    ]
+  },
+  "storage": {
+    "root": {
+      "layout": {
+        "struct": {
+          "fields": [
+            {
+              "layout": {
+                "leaf": {
+                  "key": "0x00000000",
+                  "ty": 0
+                }
+              },
+              "name": "rooms"
+            }
+          ],
+          "name": "GameRoom"
+        }
+      },
+      "root_key": "0x00000000",
+      "ty": 5
+    }
+  },
+  "types": [
+    {
+      "id": 0,
+      "type": {
+        "def": {
+          "sequence": {
+            "type": 1
+          }
+        }
+      }
+    },
+    {
+      "id": 1,
+      "type": {
+        "def": {
+          "composite": {
+            "fields": [
+              {
+                "name": "id",
+                "type": 2,
+                "typeName": "u32"
+              },
+              {
+                "name": "name",
+                "type": 3,
+                "typeName": "String"
+              },
+              {
+                "name": "status",
+                "type": 3,
+                "typeName": "String"
+              },
+              {
+                "name": "players",
+                "type": 2,
+                "typeName": "u32"
+              },
+              {
+                "name": "max_players",
+                "type": 2,
+                "typeName": "u32"
+              },
+              {
+                "name": "description",
+                "type": 3,
+                "typeName": "String"
+              },
+              {
+                "name": "room_id",
+                "type": 3,
+                "typeName": "String"
+              },
+              {
+                "name": "participants",
+                "type": 4,
+                "typeName": "Vec<String>"
+              }
+            ]
+          }
+        },
+        "path": [
+          "game_room",
+          "game_room",
+          "Room"
+        ]
+      }
+    },
+    {
+      "id": 2,
+      "type": {
+        "def": {
+          "primitive": "u32"
+        }
+      }
+    },
+    {
+      "id": 3,
+      "type": {
+        "def": {
+          "primitive": "str"
+        }
+      }
+    },
+    {
+      "id": 4,
+      "type": {
+        "def": {
+          "sequence": {
+            "type": 3
+          }
+        }
+      }
+    },
+    {
+      "id": 5,
+      "type": {
+        "def": {
+          "composite": {
+            "fields": [
+              {
+                "name": "rooms",
+                "type": 0,
+                "typeName": "<Vec<Room> as::ink::storage::traits::AutoStorableHint<::ink::\nstorage::traits::ManualKey<1635174773u32, ()>,>>::Type"
+              }
+            ]
+          }
+        },
+        "path": [
+          "game_room",
+          "game_room",
+          "GameRoom"
+        ]
+      }
+    },
+    {
+      "id": 6,
+      "type": {
+        "def": {
+          "variant": {
+            "variants": [
+              {
+                "fields": [
+                  {
+                    "type": 7
+                  }
+                ],
+                "index": 0,
+                "name": "Ok"
+              },
+              {
+                "fields": [
+                  {
+                    "type": 8
+                  }
+                ],
+                "index": 1,
+                "name": "Err"
+              }
+            ]
+          }
+        },
+        "params": [
+          {
+            "name": "T",
+            "type": 7
+          },
+          {
+            "name": "E",
+            "type": 8
+          }
+        ],
+        "path": [
+          "Result"
+        ]
+      }
+    },
+    {
+      "id": 7,
+      "type": {
+        "def": {
+          "tuple": []
+        }
+      }
+    },
+    {
+      "id": 8,
+      "type": {
+        "def": {
+          "variant": {
+            "variants": [
+              {
+                "index": 1,
+                "name": "CouldNotReadInput"
+              }
+            ]
+          }
+        },
+        "path": [
+          "ink_primitives",
+          "LangError"
+        ]
+      }
+    },
+    {
+      "id": 9,
+      "type": {
+        "def": {
+          "variant": {
+            "variants": [
+              {
+                "fields": [
+                  {
+                    "type": 10
+                  }
+                ],
+                "index": 0,
+                "name": "Ok"
+              },
+              {
+                "fields": [
+                  {
+                    "type": 8
+                  }
+                ],
+                "index": 1,
+                "name": "Err"
+              }
+            ]
+          }
+        },
+        "params": [
+          {
+            "name": "T",
+            "type": 10
+          },
+          {
+            "name": "E",
+            "type": 8
+          }
+        ],
+        "path": [
+          "Result"
+        ]
+      }
+    },
+    {
+      "id": 10,
+      "type": {
+        "def": {
+          "primitive": "bool"
+        }
+      }
+    },
+    {
+      "id": 11,
+      "type": {
+        "def": {
+          "variant": {
+            "variants": [
+              {
+                "fields": [
+                  {
+                    "type": 1
+                  }
+                ],
+                "index": 0,
+                "name": "Ok"
+              },
+              {
+                "fields": [
+                  {
+                    "type": 8
+                  }
+                ],
+                "index": 1,
+                "name": "Err"
+              }
+            ]
+          }
+        },
+        "params": [
+          {
+            "name": "T",
+            "type": 1
+          },
+          {
+            "name": "E",
+            "type": 8
+          }
+        ],
+        "path": [
+          "Result"
+        ]
+      }
+    },
+    {
+      "id": 12,
+      "type": {
+        "def": {
+          "variant": {
+            "variants": [
+              {
+                "fields": [
+                  {
+                    "type": 0
+                  }
+                ],
+                "index": 0,
+                "name": "Ok"
+              },
+              {
+                "fields": [
+                  {
+                    "type": 8
+                  }
+                ],
+                "index": 1,
+                "name": "Err"
+              }
+            ]
+          }
+        },
+        "params": [
+          {
+            "name": "T",
+            "type": 0
+          },
+          {
+            "name": "E",
+            "type": 8
+          }
+        ],
+        "path": [
+          "Result"
+        ]
+      }
+    },
+    {
+      "id": 13,
+      "type": {
+        "def": {
+          "composite": {
+            "fields": [
+              {
+                "type": 14,
+                "typeName": "[u8; 32]"
+              }
+            ]
+          }
+        },
+        "path": [
+          "ink_primitives",
+          "types",
+          "AccountId"
+        ]
+      }
+    },
+    {
+      "id": 14,
+      "type": {
+        "def": {
+          "array": {
+            "len": 32,
+            "type": 15
+          }
+        }
+      }
+    },
+    {
+      "id": 15,
+      "type": {
+        "def": {
+          "primitive": "u8"
+        }
+      }
+    },
+    {
+      "id": 16,
+      "type": {
+        "def": {
+          "primitive": "u128"
+        }
+      }
+    },
+    {
+      "id": 17,
+      "type": {
+        "def": {
+          "composite": {
+            "fields": [
+              {
+                "type": 14,
+                "typeName": "[u8; 32]"
+              }
+            ]
+          }
+        },
+        "path": [
+          "ink_primitives",
+          "types",
+          "Hash"
+        ]
+      }
+    },
+    {
+      "id": 18,
+      "type": {
+        "def": {
+          "primitive": "u64"
+        }
+      }
+    },
+    {
+      "id": 19,
+      "type": {
+        "def": {
+          "variant": {}
+        },
+        "path": [
+          "ink_env",
+          "types",
+          "NoChainExtension"
+        ]
+      }
+    }
+  ],
+  "version": 5
+}
