@@ -15,7 +15,18 @@ const fixRecastPlugin: PluginOption = {
 };
 
 export default defineConfig({
-  plugins: [react(),fixRecastPlugin],
+  plugins: [react(),
+    {
+      name: 'fix-recast',
+      transform(code, id) {
+        // Check if the current file is 'recast-detour.js'
+        if (id.includes('recast-detour.js')) {
+          // Replace 'this["Recast"]' with 'window["Recast"]'
+          return code.replace(`this["Recast"]`, 'window["Recast"]');
+        }
+      }
+    }
+  ],
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),

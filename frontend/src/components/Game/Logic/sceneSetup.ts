@@ -4,6 +4,7 @@ import Recast from "recast-detour";
 import { Assets } from './Assets';
 import { GUI } from './GUI';
 
+
 export class GameScene {
     private scene: Scene;
     private canvas: HTMLCanvasElement;
@@ -36,7 +37,7 @@ export class GameScene {
         camera.attachControl(this.canvas, true);
         const recast = await Recast()
         const navigationPlugin = new RecastJSPlugin(recast);
-        navigationPlugin.setWorkerURL("/home/kagwe/projects/loyalty/src/workers/navMeshWorker.js");
+        navigationPlugin.setWorkerURL("frontend/src/workers/navMeshWorker.js");
         this.navigation = navigationPlugin;
     }
 
@@ -150,7 +151,7 @@ export class GameScene {
         console.log(sphere.material)
 
 
-       console.log("samemo",assets.cavalry[0].model)
+  
 
         const calvaryThreatAreaUnitOne = assets.cavalryThreatArea?.clone("calvaryThreatAreaUnitOne",null,false)
 
