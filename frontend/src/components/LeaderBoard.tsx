@@ -2,7 +2,7 @@
 import React from 'react';
 
 // Define TypeScript interfaces for player data
-interface Player {
+export interface Player {
     id: number;
     name: string;
     points: number;

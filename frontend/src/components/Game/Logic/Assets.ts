@@ -79,6 +79,8 @@ export class Assets {
 
         this.initializeThreatAreas(scene);
 
+        
+
     }
 
     public setLoyalPieces(){
@@ -145,10 +147,12 @@ export class Assets {
 
     private async createAssetTask( modelFile: string, assetKey: string) {
 
+        const banners = await this.loadAsset(modelFile);
+
 
             switch (assetKey) {
                 case "cavalry":
-                    this._cavalry_model = (await this.loadAsset(modelFile))[0];
+                    this._cavalry_model = banners[0];
                     this._cavalry_model.isPickable = true;
                     const cavalryMaterial = this.setTokenUriToUnit(assetKey);
                     this._cavalry_model.getChildMeshes(false, (node) => {
@@ -161,7 +165,7 @@ export class Assets {
                     break;
 
                 case "infantry":
-                    this._infantry_model = (await this.loadAsset(modelFile))[0];
+                    this._infantry_model = banners[0];
                     this._infantry_model.isPickable = true;
                     const infantryMaterial = this.setTokenUriToUnit(assetKey);
                     this._infantry_model.getChildMeshes(false, (node) => {
@@ -174,7 +178,7 @@ export class Assets {
                     break;
 
                 case "archers":
-                    this._archers_model = (await this.loadAsset(modelFile))[0];
+                    this._archers_model = banners[0];
                     this._archers_model.isPickable =true;
                     const archersMaterial = this.setTokenUriToUnit(assetKey);
                     this._archers_model.getChildMeshes(false, (node) => {
@@ -187,7 +191,7 @@ export class Assets {
                     break;
 
                 case "artillery":
-                    this._artillery_model = (await this.loadAsset(modelFile))[0];
+                    this._artillery_model = banners[0];
                     this._artillery_model.isPickable = true
                     const artilleryMaterial = this.setTokenUriToUnit(assetKey);
                     this._artillery_model.getChildMeshes(false, (node) => {
@@ -234,7 +238,12 @@ export class Assets {
                 // const unitMaterial = this.setTokenUriToUnit(assetKey);
                 // newBaseMesh.material = unitMaterial;
                 if (baseMeshParent){
+                    newBaseMesh.position = new Vector3(0, 0, 0);
+                    newBaseMesh.rotation = new Vector3(0, 0, 0);
+                    newBaseMesh.scaling = new Vector3(1, 1, 1);
+                    newBaseMesh.computeWorldMatrix(true);
                     newBaseMesh.parent = baseMeshParent;
+
                 }
 
                 unitArray.push({
@@ -329,6 +338,7 @@ export class Assets {
 
         const startingPositionsReferceAssets = ['farm1', 'palace1', 'memorial', 'church', 'whitepalace', 'darkpalace', 'fortvillage', 'plains']
 
+       
         this.loyalGameplayAssets.forEach(mesh => {
             if (namesToDisable.includes(mesh.name)) {
                 mesh.isVisible = false;
@@ -368,6 +378,8 @@ export class Assets {
 
         const gridSize = 4; // Number of pieces per row and column
         const pieceSpacing = 2; // Distance between pieces
+        console.log("the len ",  this.pieces)
+
 
         units.forEach((unit,index) => {
             for (let i = 1; i <= 4; i++) {

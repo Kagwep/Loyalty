@@ -55,6 +55,7 @@ const StepCard:React.FC<Props> = (props) => {
           <h1 className='max-w-xs text-center text-slate-400 group-hover:text-white/50 text-2xl'>
             {desc}
           </h1>
+          
         </div>
       </div>
     </>

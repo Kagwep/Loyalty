@@ -7,12 +7,18 @@ import {
   childVariants,
 } from '../../animations/banners'
 function Banners() {
+  const styles = {
+    bgGradient:
+      'bg-gradient-to-br to-orange-600/20 via-fuchsia-600/20 from-indigo-600/20',
+    btn: 'px-5 text-center rounded-md font-medium border-indigo-200 py-2 bg-indigo-600 hover:bg-indigo-500 hover:border-indigo-700 text-3xl',
+  }
   return (
     <>
       <section className='p-4 pb-24 text-white'>
         <div className='container max-w-screen-lg mx-auto overflow-hidden'>
           <div className='flex flex-col items-center space-y-8'>
             {/* Content */}
+            
             <motion.div
               variants={parentVariants}
               initial='hidden'
@@ -31,7 +37,7 @@ function Banners() {
                 className='text-slate-400 max-w-lg text-center text-2xl'
               >
                 We are a huge marketplace dedicated to connecting great artists
-                of all Loalty with their fans and unique token collectors!
+                of all Loyalty with their fans and unique token collectors!
               </motion.p>
             </motion.div>
             {/* Collection of NFTs */}

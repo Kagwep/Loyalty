@@ -37,7 +37,7 @@ function NFTCard({ img, title, price, likes, sale }:{ img:string, title:string, 
         {/* Hover */}
         <div className='absolute hidden top-1/4 left-1/3 md:left-1/4 group-hover:flex animate-bounce transition-all ease-in-out duration-1000'>
           <button className='text-sm px-6 py-2 bg-indigo-600 rounded-md hover:bg-indigo-700 duration-200 ease-in-out'>
-            Place bid
+            Buy
           </button>
         </div>
       </div>

@@ -35,6 +35,7 @@ function MarketplaceHero() {
 
   return (
     <>
+
       <section
         className={`py-36 p-4 md:py-52 relative overflow-hidden text-white ${styles.bgGradient}`}
       >
