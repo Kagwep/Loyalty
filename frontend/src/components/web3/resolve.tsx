@@ -15,7 +15,7 @@ const DELAY = 6000
 
 export const Resolve: React.FC<{ slug: string }> = ({ slug }) => {
   const { api } = useInkathon()
-  const { contract } = useRegisteredContract(ContractIds.Link)
+  const { contract } = useRegisteredContract(ContractIds.GameRoom)
 
   const message = useMemo(() => {
     if (!contract) return undefined
@@ -56,7 +56,7 @@ export const Resolve: React.FC<{ slug: string }> = ({ slug }) => {
         }
       })
       .catch((e) => {
-        toast.error("Unable to resolve link")
+        toast.error("Unable to resolve GameRoom")
         console.log({ e })
       })
   }, [api, contract, message, mounted, slug])
@@ -80,10 +80,10 @@ export const Resolve: React.FC<{ slug: string }> = ({ slug }) => {
             width={400}
           />
         </div>
-        <h1 className="text-2xl text-ink-text">Upscaling link...</h1>
+        <h1 className="text-2xl text-ink-text">Upscaling GameRoom...</h1>
 
         <a href="/" className="underline" target="_blank">
-          Shrink your own link?
+          Shrink your own GameRoom?
         </a>
       </main>
       <div className="w-full py-2">
