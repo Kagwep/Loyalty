@@ -4,7 +4,7 @@ import Canvas from "./components/Game/Logic/Loyalty";
 import socket from './socket';
 import CustomDialog from "./components/Customs/CustomDialog";
 import InitGame from "./InitGame";
-import { Players } from "./components/Game/Logic/Loyalty";
+import { Players } from "./utils/commonGame";
 
 
 function Game() {

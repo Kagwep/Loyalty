@@ -45,7 +45,7 @@ const formSchema = z.object({
 
 export const LinkContractInteractions: FC = () => {
   const { api, activeAccount, connect, isConnected } = useInkathon()
-  const { contract } = useRegisteredContract(ContractIds.Flipper)
+  const { contract } = useRegisteredContract(ContractIds.GameRoom)
 
   const initialSlug = useMemo(
     () => customAlphabet("abcdefghijklmnopqrstuvwxyz", 5)(),

@@ -2,7 +2,7 @@ import { Button, Stack, TextField } from "@mui/material";
 import React,{ useState } from "react";
 import CustomDialog from "./components/Customs/CustomDialog";
 import socket from './socket';
-import { Players } from "./components/Game/Logic/Loyalty";
+import { Players } from "./utils/commonGame";
 
 
 
