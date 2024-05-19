@@ -35,7 +35,7 @@ export class GameScene {
     private async initRecast(): Promise<void> {
         const camera = new ArcRotateCamera("camera", -Math.PI / 2, Math.PI / 2.5, 10, Vector3.Zero(), this.scene);
         camera.attachControl(this.canvas, true);
-        const recast = await Recast()
+        const recast = await new Recast()
         const navigationPlugin = new RecastJSPlugin(recast);
         navigationPlugin.setWorkerURL("frontend/src/workers/navMeshWorker.js");
         this.navigation = navigationPlugin;
