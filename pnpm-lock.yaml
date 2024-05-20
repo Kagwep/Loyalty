@@ -104,6 +104,9 @@ importers:
       '@babylonjs/loaders':
         specifier: ^7.6.0
         version: 7.6.0(@babylonjs/core@7.5.0)(babylonjs-gltf2interface@7.6.0)
+      '@download/blockies':
+        specifier: ^1.0.3
+        version: 1.0.3
       '@emotion/react':
         specifier: ^11.11.4
         version: 11.11.4(@types/react@18.3.1)(react@18.3.1)
@@ -706,6 +709,10 @@ packages:
       human-id: 1.0.2
       prettier: 2.8.8
     dev: true
+
+  /@download/blockies@1.0.3:
+    resolution: {integrity: sha512-iGDh2M6pFuXg9kyW+U//963LKylSLFpLG5hZvUppCjhkiDwsYquQPyamxCQlLASYySS3gGKAki2eWG9qIHKCew==}
+    dev: false
 
   /@emotion/babel-plugin@11.11.0:
     resolution: {integrity: sha512-m4HEDZleaaCH+XgDDsPF15Ht6wTLsgDTeR3WYj9Q/k76JtWhrJjcP4+/XlG8LGT/Rol9qUfOIztXeA84ATpqPQ==}

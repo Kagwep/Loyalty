@@ -7,7 +7,7 @@ import {
 import { useEffect, useMemo } from "react"
 import Lottie from "react-lottie"
 import animationData from "../../assets/resolve.json"
-import { ContractIds } from "../../deployments/deployments"
+import { ContractIds } from "../../deployments/game_room/deployments"
 import { Footer } from "./footer"
 import toast from "react-hot-toast"
 

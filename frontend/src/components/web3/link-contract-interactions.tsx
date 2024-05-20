@@ -13,7 +13,7 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import { ContractIds } from "@/deployments/deployments"
+import { ContractIds } from "@/deployments/game_room/deployments"
 import { zodResolver } from "@hookform/resolvers/zod"
 import {
   contractQuery,

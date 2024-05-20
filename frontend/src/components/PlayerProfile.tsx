@@ -1,18 +1,28 @@
 import React, {useState} from 'react';
 import { Player } from './LeaderBoard';
 import CreateBanner from './CreateBaner';
+import { createIcon } from '@download/blockies';
 // Define the props interface using the Player interface
 interface PlayerProfileProps {
     player: Player;
+    fetchBanners: () => void;
 }
 
-const PlayerProfile: React.FC<PlayerProfileProps> = ({ player }) => {
+const PlayerProfile: React.FC<PlayerProfileProps> = ({ player,fetchBanners }) => {
 
     const [isModalOpen, setModalOpen] = useState(false);
 
+    const addressIcon = createIcon({
+        seed: player.name.toLowerCase(),
+      }).toDataURL();
+
     return (
         <div className="bg-purple-950 text-white p-4 rounded-lg shadow-lg flex flex-col w-full items-center z-index-10">
-            <img src={player.avatarUrl} alt="Player Avatar" className="w-24 h-24 rounded-full border-4 border-purple-500"/>
+            <img
+            src={addressIcon}
+            alt="Generated address icon"
+            className="size-12 rounded-full"
+            />
             <h2 className="text-xl font-bold mt-2">{player.name}</h2>
             <p className="text-purple-300 text-xl">Points: {player.points}</p>
 
@@ -28,7 +38,7 @@ const PlayerProfile: React.FC<PlayerProfileProps> = ({ player }) => {
                     Create Banner
                 </button>
             </div>
-            {isModalOpen && <CreateBanner closeModal={() => setModalOpen(false)} />}
+            {isModalOpen && <CreateBanner closeModal={() => setModalOpen(false)} fetchBanners={fetchBanners}/>}
         </div>
     );
 };

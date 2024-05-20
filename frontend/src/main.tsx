@@ -4,7 +4,7 @@ import React from "react"
 import ReactDOM from "react-dom/client"
 import App from "./App.tsx"
 import { TooltipProvider } from "./components/ui/tooltip"
-import { getDeployments } from "./deployments/deployments.ts"
+import { getDeployments } from "./deployments/game_room/deployments.ts"
 import "./global.css"
 import { Toaster } from "react-hot-toast"
 import { BrowserRouter,Route,Routes } from 'react-router-dom'

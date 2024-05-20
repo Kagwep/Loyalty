@@ -8,7 +8,7 @@ import {
     decodeOutput,
     useRegisteredContract,
   } from "@scio-labs/use-inkathon"
-  import { ContractIds } from "@/deployments/deployments";
+  import { ContractIds } from "@/deployments/game_room/deployments";
 import toast from 'react-hot-toast';
 import { contractTxWithToast } from '@/utils/contract-tx-with-toast'
 import { Players } from '@/utils/commonGame';

@@ -9,7 +9,7 @@ import {
   decodeOutput,
   useRegisteredContract,
 } from "@scio-labs/use-inkathon"
-import { ContractIds } from "@/deployments/deployments";
+import { ContractIds } from "@/deployments/game_room/deployments";
 import CreateRoomModal from './CreateRoomModal';
 import toast from 'react-hot-toast';
 import { Link } from 'react-router-dom';
@@ -57,7 +57,7 @@ const BattleRoomList: React.FC<BattleRoomProps> = () => {
       const [username, setUsername] = useState("musa");
       const [usernameSubmitted, setUsernameSubmitted] = useState(false);
     
-      const [room, setRoom] = useState("fdgdfgfdg");
+      const [room, setRoom] = useState("");
       const [orientation, setOrientation] = useState("");
       const [players, setPlayers] = useState<Players[]>([]);
       const [players_identity, setPlayersIdentity] = useState<string>("");
@@ -108,6 +108,8 @@ const BattleRoomList: React.FC<BattleRoomProps> = () => {
 
 
        const fetchRooms= async () => {
+
+        console.log(contract)
         if (!contract || !api) return
     
         setFetchIsLoading(true)
@@ -145,6 +147,8 @@ const BattleRoomList: React.FC<BattleRoomProps> = () => {
           setPlayers(roomData.players);
         });
       }, []);
+
+      //console.log(rooms)
       
     return (
       <>
