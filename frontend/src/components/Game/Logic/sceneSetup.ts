@@ -3,6 +3,7 @@ import "@babylonjs/loaders";
 import Recast from "recast-detour";
 import { Assets } from './Assets';
 import { GUI } from './GUI';
+import { Game } from './Game';
 
 
 export class GameScene {
@@ -15,6 +16,7 @@ export class GameScene {
     recast: any;
     public unitTokenUris: string[] = [];
     public assets!: Assets;
+    public game: Game;
 
     constructor(canvasElement:  HTMLCanvasElement) {
 
@@ -134,7 +136,7 @@ export class GameScene {
 
         assets.cavalry[0].model.isPickable = false;
 
-
+        this.game = new Game(this.scene);
         
 
         console.log(assets.cavalry[0].strength)
@@ -257,6 +259,10 @@ export class GameScene {
                 Animation.CreateAndStartAnimation('moveToPoint', mesh, 'position', 30, 60, mesh.position, path[currentPointIndex], Animation.ANIMATIONLOOPMODE_CONSTANT, undefined, () => {
                     goToNextPoint();
                 });
+            }else {
+                console.log("Reached the last point in the path.");
+
+                this.game.checkCollisions(this.assets,mesh, mesh.name);
             }
         };
 

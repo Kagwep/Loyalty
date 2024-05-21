@@ -57,7 +57,7 @@ const BattleRoomList: React.FC<BattleRoomProps> = () => {
       const [username, setUsername] = useState("musa");
       const [usernameSubmitted, setUsernameSubmitted] = useState(false);
     
-      const [room, setRoom] = useState("");
+      const [room, setRoom] = useState("dsfdsvcewf");
       const [orientation, setOrientation] = useState("");
       const [players, setPlayers] = useState<Players[]>([]);
       const [players_identity, setPlayersIdentity] = useState<string>("");

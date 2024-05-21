@@ -1,6 +1,7 @@
-import { AbstractMesh, Scene, AssetsManager, MeshAssetTask, Sound, StandardMaterial,Color3,Mesh, MeshBuilder,SceneLoader, Vector3,Texture } from "@babylonjs/core";
+import { AbstractMesh, Scene, AssetsManager, MeshAssetTask, Sound, StandardMaterial,Color3,Mesh, MeshBuilder,SceneLoader, Vector3,Texture, Node } from "@babylonjs/core";
 
 export interface ArmyUnit {
+    unitId:number,
     name: string,
     army_type: string,
     strength: number,
@@ -50,6 +51,17 @@ export class Assets {
 
     public pieces:Map<string,  Mesh> = new Map();
 
+    public piecesThreatAreas:Map<string,  Mesh> = new Map();
+
+    public unitColors = [
+        new Color3(0, 1, 0), // Green
+        new Color3(0.4, 0, 0.4), // Deep Purple
+        new Color3(0, 0, 1), // Blue
+        new Color3(1, 1, 0)  // Yellow
+    ];
+
+    public specialUnits = ["Artillery", "Archers"];
+
     
     private scene: Scene;
     private assetsManager: AssetsManager;
@@ -90,7 +102,7 @@ export class Assets {
         units.forEach((unit) => {
 
 
-            for (let i = 1; i <= 4; i++) {
+            for (let i = 1; i <= 8; i++) {
                 const meshName = `${unit}Piece${i}`;
                 const sphere = MeshBuilder.CreateSphere(meshName, { diameter: 2 }, this.scene) as Mesh;
                 sphere.position.x = -20 + i * 5;  // Adjusting position for demo purposes
@@ -230,7 +242,7 @@ export class Assets {
 
         if (baseMesh) {
             
-            for (let i = 1; i <= 4; i++) {
+            for (let i = 1; i <= 8; i++) {
                 const newBaseMesh = baseMesh.clone(`${type}Unit${i}`, null, false) as AbstractMesh
                 const meshName = `${type}Piece${i}`;
                 const baseMeshParent = this.getLoyalPieceByName(meshName);
@@ -247,6 +259,7 @@ export class Assets {
                 }
 
                 unitArray.push({
+                    unitId:1,
                     name: `${type} Unit ${i}`,
                     army_type: type,
                     strength: strength,
@@ -364,6 +377,33 @@ export class Assets {
         
     }
 
+
+    public createAndParentThreatArea(scene: Scene, piece: Mesh, radius: any, color: { r: number; g: number; b: number; }, isSpecialUnit: any,discPos:number) {
+        const disc = MeshBuilder.CreateDisc(`${piece.name}_threatArea`, { radius: radius, tessellation: 32 }, scene);
+        disc.rotation.x = Math.PI / 2; // Rotate to be flat on the ground
+    
+        if (isSpecialUnit) {
+            // Special positioning logic for artillery and archery
+            //disc.position = piece.absolutePosition.clone();
+            const desiredDiameter = 4;
+        
+            disc.position.z += discPos; // Example offset, adjust as needed
+            // Example offset, adjust as needed
+
+            disc.scaling = new Vector3(desiredDiameter , 4, desiredDiameter );
+        } 
+    
+        const threatMaterial = new StandardMaterial(`${piece.name}_threatMaterial`, scene);
+        threatMaterial.diffuseColor = new Color3(color.r, color.g, color.b);
+        threatMaterial.alpha = 0.5; // Semi-transparent for visual effect
+        disc.material = threatMaterial;
+    
+        disc.parent = piece; // Parent the disc to the sphere
+    
+        return disc;
+    }
+    
+
     public setPiecesStartingPositions(player:any){
 
         const meshesToReferenceSetOne = [
@@ -378,33 +418,66 @@ export class Assets {
 
         const gridSize = 4; // Number of pieces per row and column
         const pieceSpacing = 2; // Distance between pieces
-        console.log("the len ",  this.pieces)
+        //console.log("the len ",  this.pieces)
 
 
-        units.forEach((unit,index) => {
-            for (let i = 1; i <= 4; i++) {
-
+        units.forEach((unit, index) => {
+            for (let i = 1; i <= 8; i++) {
                 const row = Math.floor(index / gridSize);
                 const col = index % gridSize;
-
                 const meshName = `${unit}Piece${i}`;
-                
                 const piece = this.getLoyalPieceByName(meshName);
+        
+                if (i <= 4) {
+                    const startPositionMesh = this.loyalGameplayAssetsHome.get(
+                        player.identity === 'player_one' ? meshesToReferenceSetTwo[i-1] : meshesToReferenceSetOne[i-1]
+                    );
+        
+                    if (startPositionMesh && piece) {
+                        piece.position = startPositionMesh.absolutePosition.clone();
+                        piece.position.x = startPositionMesh.absolutePosition.x + col * pieceSpacing;
+                        piece.position.z = startPositionMesh.absolutePosition.z + row * pieceSpacing;
+                        piece.position.y = 5;
+        
+                        // Assign a different material to represent different units
+                        const unitMaterial = new StandardMaterial(`${unit}Material`, this.scene);
+                        unitMaterial.diffuseColor = new Color3(Math.random(), Math.random(), Math.random()); // Random color for example
+                        piece.material = unitMaterial;
 
-                const startPositionMesh = this.loyalGameplayAssetsHome.get(
-                    player.identity === 'player_one' ? meshesToReferenceSetTwo[i-1] : meshesToReferenceSetOne[i-1]
-                  );
-                  
-                  if (startPositionMesh && piece) {
-                    
-                    piece.position = startPositionMesh.absolutePosition.clone();
-                    piece.position.x = startPositionMesh.absolutePosition.x + col * pieceSpacing;
-                    piece.position.z = startPositionMesh.absolutePosition.z + row * pieceSpacing;
-                    piece.position.y = 5;
-                  }
-                  
+                        const discPos = -15;
+
+                        const pieceThreatArea = this.createAndParentThreatArea(this.scene, piece, 3, this.unitColors[i % this.unitColors.length], this.specialUnits.includes(unit),discPos);
+
+                        this.piecesThreatAreas.set(meshName,pieceThreatArea);
+                    }
+                } else {
+                    const startPositionMesh = this.loyalGameplayAssetsHome.get(
+                        player.identity === 'player_one' ? meshesToReferenceSetOne[i-5] : meshesToReferenceSetTwo[i-5]
+                    );
+        
+                    if (startPositionMesh && piece) {
+                        piece.position = startPositionMesh.absolutePosition.clone();
+                        piece.position.x = startPositionMesh.absolutePosition.x + col * pieceSpacing;
+                        piece.position.z = startPositionMesh.absolutePosition.z + row * pieceSpacing;
+                        piece.position.y = 5;
+        
+                        // Assign red material
+                        const redMaterial = new StandardMaterial("redMaterial", this.scene);
+                        redMaterial.diffuseColor = new Color3(1, 0, 0); // Red color
+                        piece.material = redMaterial;
+
+                        const discPos = 15;
+
+                        const pieceThreatArea = this.createAndParentThreatArea(this.scene, piece, 3, { r: 1, g: 0, b: 0 }, this.specialUnits.includes(unit),discPos);
+
+                        this.piecesThreatAreas.set(meshName,pieceThreatArea);
+
+                        
+                    }
+                }
             }
-        })
+        });
+        
 
         
 
@@ -453,6 +526,10 @@ export class Assets {
         return unitMaterial
 
     }
+
+
+     // enemy assets
+
 
   
 
@@ -503,7 +580,7 @@ export class Assets {
 
 //     private createUnits(modelArray: AbstractMesh[] | undefined, unitArray: ArmyUnit[], type: string, strength: number) {
 //         if (modelArray && modelArray.length > 0) {
-//             for (let i = 1; i <= 4; i++) {
+//             for (let i = 1; i <= 8; i++) {
 //                 unitArray.push({
 //                     name: `${type} Unit ${i}`,
 //                     army_type: type,
