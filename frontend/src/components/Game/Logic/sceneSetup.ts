@@ -4,7 +4,7 @@ import Recast from "recast-detour";
 import { Assets } from './Assets';
 import { GUI } from './GUI';
 import { Game } from './Game';
-
+import { ArmyUnit } from './Assets';
 
 export class GameScene {
     private scene: Scene;
@@ -17,6 +17,11 @@ export class GameScene {
     public unitTokenUris: string[] = [];
     public assets!: Assets;
     public game: Game;
+    public playerColors = ["purple", "green", "blue", "yellow"];
+    public  opponentColors = ["red", "red", "red"];
+    private gui: GUI;
+    private units = ["Cavalry", "Infantry", "Archers", "Artillery"];
+
 
     constructor(canvasElement:  HTMLCanvasElement) {
 
@@ -63,7 +68,8 @@ export class GameScene {
             'https://hambre.infura-ipfs.io/ipfs/QmW1EP1AkVZ82GfeKsY9b1211w5a5nhXMSAGQUU6JsbY6E'
         ]
 
-        const gameGUI = new GUI(this.scene, this.unitTokenUris);
+        const gameGUI = new GUI(this.scene, this.unitTokenUris, this.playerColors, this.opponentColors);
+        this.gui = gameGUI;
 
         const box = MeshBuilder.CreateBox("box", { size: 0.05 }, this.scene) as Mesh;
         box.position.x = 1.5;
@@ -116,9 +122,9 @@ export class GameScene {
             outpost.material = transparentMaterial;
         }
 
-        console.log(meshes)
+       // console.log(meshes)
         this.navMesh = meshes.find(mesh => mesh.name === "NavMesh" && mesh instanceof Mesh) as Mesh;
-        console.log(this.navMesh)
+        //console.log(this.navMesh)
         
         const assets = new Assets(this.scene);
 
@@ -137,22 +143,18 @@ export class GameScene {
         assets.cavalry[0].model.isPickable = false;
 
         this.game = new Game(this.scene);
-        
-
-        console.log(assets.cavalry[0].strength)
-    
-
-        console.log(assets.cavalry[0].model.isEnabled());
-
-        console.log(assets.meshNameToIndex.get('loyalpalace'));
-
-        
-        // Apply the material to the cavalry model
-     
-
-        console.log(sphere.material)
 
 
+        gameGUI.updatePlayerStat(0, `Total Strength: ${assets.getFirstFourStrength()}`, "purple");
+        console.log("Player strenth Total",assets.getLastFourStrength())
+
+        // console.log("Player pieces",assets.pieces)
+        console.log("Player units",assets.getAllUnits())
+        console.log("Player units",assets.getAllEnemyUnits())
+
+
+
+        // console.log("Player strenth Total",assets.getFirstFourStrength())
   
 
         const calvaryThreatAreaUnitOne = assets.cavalryThreatArea?.clone("calvaryThreatAreaUnitOne",null,false)
@@ -219,14 +221,63 @@ export class GameScene {
         }
     }
 
+    private  parseMeshName(meshName: string): { unitType: string | null, unitNumber: number | null } {
+        for (let unit of this.units) {
+            const regex = new RegExp(`${unit}\\D*(\\d+)`, 'i');
+            const match = meshName.match(regex);
+            if (match) {
+                return {
+                    unitType: unit,
+                    unitNumber: parseInt(match[1], 10)
+                };
+            }
+        }
+        return {
+            unitType: null,
+            unitNumber: null
+        };
+    }
+
+    private findUnit(unitType: string, unitNumber: number): ArmyUnit | undefined {
+        let unitArray: ArmyUnit[];
+    
+        switch (unitType) {
+            case "Cavalry":
+                unitArray = this.assets.getCavalry();
+                break;
+            case "Infantry":
+                unitArray = this.assets.getInfantry();
+                break;
+            case "Archers":
+                unitArray = this.assets.getArchers();
+                break;
+            case "Artillery":
+                unitArray = this.assets.getArtillery();
+                break;
+            default:
+                return undefined;
+        }
+    
+        return unitArray[unitNumber-1];
+    }
+
     private addListeners(): void {
         this.scene.onPointerDown = (evt, pickResult) => {
-            console.log(pickResult.pickedMesh);
-            if (pickResult.hit && pickResult.pickedMesh && (pickResult.pickedMesh.name === "sphere" ||  this.assets.pieces.has(pickResult.pickedMesh.name))) {
+            //console.log(pickResult.pickedMesh);
+            if (pickResult.hit && pickResult.pickedMesh &&  this.assets.pieces.has(pickResult.pickedMesh.name)) {
                 this.selectedMesh = pickResult.pickedMesh as Mesh;
+                const { unitType, unitNumber } = this.parseMeshName(pickResult.pickedMesh.name);
+
+                const activeUnit = this.findUnit.call(this, unitType, unitNumber);
+
+                console.log(activeUnit);
+
+                this.gui.updateActiveUnit(activeUnit);
             } else if (pickResult.hit && pickResult.pickedMesh === this.navMesh && this.selectedMesh) {
-                console.log(pickResult.pickedPoint!)
+                //console.log(pickResult.pickedPoint!)
                 this.navigateMeshToPosition(pickResult.pickedPoint!);
+
+
             }
         };
     }
@@ -263,6 +314,11 @@ export class GameScene {
                 console.log("Reached the last point in the path.");
 
                 this.game.checkCollisions(this.assets,mesh, mesh.name);
+
+      
+
+
+
             }
         };
 

@@ -11,7 +11,7 @@ import {
   decodeOutput,
   useRegisteredContract,
 } from "@scio-labs/use-inkathon"
-import { ContractIds } from "@/deployments//loyal_marketplace/deployments";
+import { ContractIds } from "@/deployments/loyalty_marketplace/deployments";
 import toast from 'react-hot-toast';
 import NFTCard from './NFTCard'
 import nfts from '../../data/nfts'
@@ -58,12 +58,17 @@ function NFTCardsList() {
 
  // console.log(ContractIds)
 
-  const { contract } = useRegisteredContract(ContractIds.Markeplace)
+ //console.log(ContractIds.Marketplace);
+
+  const { contract,address } = useRegisteredContract(ContractIds.Marketplace);
+
+
 
 
   const fetchBaners= async () => {
 
-    console.log(contract)
+   // console.log(contract)
+
     if (!contract || !api) return
 
     setFetchIsLoading(true)
@@ -71,7 +76,7 @@ function NFTCardsList() {
       const result = await contractQuery(api, '', contract, 'get_all_listings')
       const { output, isError, decodedOutput } = decodeOutput(result, contract, 'get_all_listings')
       if (isError) throw new Error(decodedOutput)
-        console.log(output)
+        //console.log(output)
       setBanners(output)
 
       // NOTE: Currently disabled until `typechain-polkadot` dependencies are upted to support ink! v5
@@ -95,18 +100,18 @@ function NFTCardsList() {
     fetchBaners()
   }, [contract])
 
-  //console.log('banners',banners)
+  console.log('banners',banners)
 
   return (
     <>
-      {nfts.map((nft, idx) => {
+      {banners.map((banner, idx) => {
         return (
           <motion.div variants={childVariants} key={idx}>
             <NFTCard
-              key={nft.title}
-              img={nft.img}
-              title={nft.title}
-              price={nft.price}
+              key={banner.id}
+              img={banner.tokenUri}
+              title={banner.title}
+              price={banner.price}
             />
           </motion.div>
         )

@@ -9,11 +9,12 @@ import {
   decodeOutput,
   useRegisteredContract,
 } from "@scio-labs/use-inkathon"
-import { ContractIds } from "@/deployments/game_room/deployments";
+import { ContractIds } from "@/deployments/loyalty_marketplace/deployments";
 import toast from 'react-hot-toast';
 import { contractTxWithToast } from '@/utils/contract-tx-with-toast'
 
 type FormData = {
+  title:string,
   price: number;
 };
 
@@ -28,6 +29,7 @@ const CreateBanner = ({ closeModal,fetchBanners }: Props) => {
   const [isSubmissionSuccessful, setSubmissionSuccessful] = useState<boolean>(false);
   const [fileSubmitted, setFileSubmitted] = useState<boolean>(false);
   const [formData, setFormData] = useState<FormData>({
+    title:"",
     price: 0,
   });
 
@@ -45,16 +47,27 @@ const CreateBanner = ({ closeModal,fetchBanners }: Props) => {
 
  // console.log(ContractIds)
 
-  const { contract } = useRegisteredContract(ContractIds.GameRoom)
+  const { contract } = useRegisteredContract(ContractIds.Marketplace)
   //onsole.log(contract)
 
 
+  function generateUniqueTokenId(): number {
+    const timestamp = Date.now(); // Get the current timestamp in milliseconds
+    const randomPart = Math.floor(Math.random() * 1000); // Random number between 0 and 999
+    const uniqueId = timestamp * 1000 + randomPart; // Combine timestamp and random number
+  
+    // Ensure it fits within the range of u32
+    return uniqueId % Math.pow(2, 32);
+  }
   const handleSubmit = async (event: FormEvent) => {
 
     event.preventDefault();
 
 
-    const allFieldsFilled = Object.values(formData).every(value => value <= 0);
+    const allFieldsFilled = Object.values(formData).every(value => value !== null && value !== undefined && value !== "");
+
+    const tokenId: number = generateUniqueTokenId();
+    console.log("Generated unique token_id:", tokenId);
         
     if (!allFieldsFilled) {
         toast.error('Confirm all the fields are filled and try again…', {
@@ -76,13 +89,11 @@ const CreateBanner = ({ closeModal,fetchBanners }: Props) => {
       return
     }
 
-    //token_id: u32, price: u128, token_uri: String
-    const tokenId = 12;
-  
+
     
     try {
       let response = await contractTxWithToast(api, activeAccount.address, contract, 'create_listing', {}, [
-          tokenId,parseInt(formData.price.toString()),fileURL
+          tokenId,parseInt(formData.price.toString()),fileURL,formData.title
       ])
 
       const { dryResult, result: responseResult, ...rest } = response;
@@ -134,6 +145,17 @@ const CreateBanner = ({ closeModal,fetchBanners }: Props) => {
                 </button>
               </div>
               <div className="mb-4">
+              <label className="block text-gray-700 text-sm font-bold mb-2 text-xl" htmlFor="title">
+                  Title
+                </label>
+                <input
+                 type="text" 
+                 id='title'
+                 name="title" 
+                 placeholder="title" 
+                 value={formData.title} 
+                 onChange={handleInputChange} 
+                 className="w-full px-3 py-2 border border-gray-300 rounded shadow-sm text-gray-700 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-2xl" />
                 <label className="block text-gray-700 text-sm font-bold mb-2 text-xl" htmlFor="price">
                   Price
                 </label>

@@ -1,5 +1,5 @@
 import React from 'react'
-import { FaEthereum } from 'react-icons/fa'
+import { FaCoins } from 'react-icons/fa'
 
 
 function NFTCard({ img, title, price }:{ img:string, title:string, price:string }) {
@@ -22,8 +22,8 @@ function NFTCard({ img, title, price }:{ img:string, title:string, price:string 
           <div className='flex justify-between'>
             {/* Price */}
             <div className='flex space-x-2 text-indigo-600 items-center'>
-              <FaEthereum size={18} />
-              <p className='text-2xl font-semibold'>{price} ETH</p>
+              <FaCoins size={18} />
+              <p className='text-2xl font-semibold'>{price} ROC</p>
             </div>
           </div>
         </div>

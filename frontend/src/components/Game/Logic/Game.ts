@@ -2,6 +2,7 @@ import { Mesh, Scene } from "@babylonjs/core";
 
 
 export class Game {
+    
     scene: Scene;
     pieces: Map<any, any>;
 

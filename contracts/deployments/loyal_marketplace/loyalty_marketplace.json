@@ -1,6 +1,6 @@
 {
   "source": {
-    "hash": "0xe47ab21e690288449a14272d76c65ffdbc43b973aa6a9cf49ed124b229761610",
+    "hash": "0x41aaf20dbf6180b55e5a89bb00ccd379fcfa9a70a57501d3583023b02f7ff3bc",
     "language": "ink! 5.0.0",
     "compiler": "rustc 1.80.0-nightly",
     "build_info": {
@@ -289,6 +289,15 @@
               ],
               "type": 8
             }
+          },
+          {
+            "label": "title",
+            "type": {
+              "displayName": [
+                "String"
+              ],
+              "type": 8
+            }
           }
         ],
         "default": false,
@@ -385,6 +394,32 @@
           "type": 20
         },
         "selector": "0xd0c51a35"
+      },
+      {
+        "args": [
+          {
+            "label": "listing_id",
+            "type": {
+              "displayName": [
+                "u32"
+              ],
+              "type": 2
+            }
+          }
+        ],
+        "default": false,
+        "docs": [],
+        "label": "update_listing",
+        "mutates": true,
+        "payable": false,
+        "returnType": {
+          "displayName": [
+            "ink",
+            "MessageResult"
+          ],
+          "type": 20
+        },
+        "selector": "0xa1005747"
       },
       {
         "args": [],
@@ -563,6 +598,11 @@
               },
               {
                 "name": "token_uri",
+                "type": 8,
+                "typeName": "String"
+              },
+              {
+                "name": "title",
                 "type": 8,
                 "typeName": "String"
               }

@@ -1,51 +1,36 @@
-import { SubstrateDeployment } from "@scio-labs/use-inkathon"
-import GameRoomMainnetABI  from "../../../contracts/deployments/game_room/game_room.json"
-import MarketplaceABI from '../../../contracts/deployments/loyal_marketplace/loyalty_marketplace.json'
-import { address as gameRoomDevelopment } from "../../../contracts/deployments/game_room/development"
-import { address as gameRoomPopNetwork } from "../../../contracts/deployments/game_room/pop-network"
-import { address as gameRoomRococoNetwork } from "../../../contracts/deployments/game_room/rococo"
 
-import { address as marketplaceDevelopment } from "../../../contracts/deployments/loyal_marketplace/development"
-import { address as marketplacePopNetwork } from "../../../contracts/deployments/loyal_marketplace/pop-network"
-import { address as marketplaceRococoNetwork } from "../../../contracts/deployments/loyal_marketplace/rococo"
+import leaderBoardMainnetABI  from "../../../contracts/deployments/leaderboard/leaderboard.json"
+import { address as leaderBoardDevelopment } from "../../../contracts/deployments/leaderboard/development"
+import { address as leaderBoardPopNetwork } from "../../../contracts/deployments/leaderboard/pop-network"
+import { address as leaderBoardRococoNetwork } from "../../../contracts/deployments/leaderboard/rococo"
+
+
 
 export enum ContractIds {
-  GameRoom = "game_room",
-  Markeplace = 'loyal_marketplace'
+  leaderBoard = "leaderboard",
   
 }
 
-const DEVELOPMENT_DEPLOYMENTS = {
-  contractId: ContractIds.GameRoom,
+export const DEVELOPMENT_DEPLOYMENTS = {
+  contractId: ContractIds.leaderBoard,
   networkId: "development",
-  abi: GameRoomMainnetABI,
-  address: gameRoomDevelopment,
+  abi: leaderBoardMainnetABI,
+  address: leaderBoardDevelopment,
 }
 
-const POP_NETWORK_DEPLOYMENTS = {
-  contractId: ContractIds.GameRoom,
+export const POP_NETWORK_DEPLOYMENTS = {
+  contractId: ContractIds.leaderBoard,
   networkId: "pop-network-testnet",
-  abi: GameRoomMainnetABI,
-  address: gameRoomPopNetwork,
+  abi: leaderBoardMainnetABI,
+  address: leaderBoardPopNetwork,
 }
 
-const ROCOCO_NETWORK_DEPLOYMENTS = {
-  contractId: ContractIds.GameRoom,
+export const ROCOCO_NETWORK_DEPLOYMENTS = {
+  contractId: ContractIds.leaderBoard,
   networkId: "contracts",
-  abi: GameRoomMainnetABI,
-  address: gameRoomRococoNetwork,
+  abi: leaderBoardMainnetABI,
+  address: leaderBoardRococoNetwork,
 }
 
 
 
-
-export const getDeployments = (): SubstrateDeployment[] => {
-  const deployments: SubstrateDeployment[] = []
-
-  deployments.push(POP_NETWORK_DEPLOYMENTS)
-  deployments.push(DEVELOPMENT_DEPLOYMENTS)
-  deployments.push(ROCOCO_NETWORK_DEPLOYMENTS)
-
-
-  return deployments
-}

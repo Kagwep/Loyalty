@@ -28,7 +28,7 @@ import {
   decodeOutput,
   useRegisteredContract,
 } from "@scio-labs/use-inkathon"
-import { ContractIds } from "@/deployments//loyal_marketplace/deployments";
+import { ContractIds } from "@/deployments/loyalty_marketplace/deployments";
 import toast from 'react-hot-toast';
 
 
@@ -64,7 +64,7 @@ const {
 
 // console.log(ContractIds)
 
-const { contract } = useRegisteredContract(ContractIds.Markeplace)
+const { contract } = useRegisteredContract(ContractIds.Marketplace)
 
 
 const fetchBaners= async () => {
@@ -117,7 +117,7 @@ useEffect(() => {
                       className='grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-8'
                     >
                       {/* Card 1 */}
-                      <NFTGrid  />
+                      <NFTGrid  banners={banners}/>
 
                     </motion.div>
           

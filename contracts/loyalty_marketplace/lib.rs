@@ -20,6 +20,7 @@ mod loyalty_marketplace {
         price: u128,
         currently_listed: bool,
         token_uri:String,
+        title: String,
 
     }
     /// Defines the storage of your contract.
@@ -79,7 +80,7 @@ mod loyalty_marketplace {
         /// This one flips the value of the stored `bool` from `true`
         /// to `false` and vice versa.
         #[ink(message)]
-        pub fn create_listing(&mut self, token_id: u32, price: u128, token_uri: String) -> Result<(), MarketPlaceError> {
+        pub fn create_listing(&mut self, token_id: u32, price: u128, token_uri: String, title:String) -> Result<(), MarketPlaceError> {
 
             let caller = self.env().caller();
 
@@ -107,6 +108,7 @@ mod loyalty_marketplace {
                         price,
                         currently_listed: true,
                         token_uri,
+                        title,
                     };
                     self.listings.push(new_listing);
                     self.token_id_to_listing_id.insert(token_id, &new_listing_id); // Mark the token as listed
@@ -193,7 +195,33 @@ mod loyalty_marketplace {
         
             Ok(())
         }
+
+        #[ink(message)]
+        pub fn update_listing(&mut self, listing_id: u32) -> Result<(), MarketPlaceError> {
+            let caller = self.env().caller();
         
+            // Safely calculate the index from the listing_id, handling potential underflow
+            let index = listing_id.checked_sub(1).ok_or(MarketPlaceError::InvalidListingId)?;
+        
+            // Verify the index is within bounds
+            if index >= self.listings.len().try_into().unwrap() {
+                return Err(MarketPlaceError::ListingNotFound);
+            }
+        
+            // Access the listing directly by its index
+            let listing = &mut self.listings[index as usize];
+        
+            // Check if the caller is the seller of the listing
+            if listing.seller != caller {
+                return Err(MarketPlaceError::Unauthorized);
+            }
+        
+            // Update the price of the listing
+            listing.currently_listed = true;
+        
+            Ok(())
+        }
+
 
         #[ink(message)]
         pub fn get_all_listings(&self) -> Vec<Listing> {
@@ -243,6 +271,7 @@ mod loyalty_marketplace {
         
                 // Mark the listing as no longer available
                 listing.currently_listed = false;
+                listing.seller = caller;
             } // Mutable borrow of listing ends here
         
             // Transfer the token ownership
@@ -255,7 +284,10 @@ mod loyalty_marketplace {
         
             Ok(())
         }
-            
+        
+        
+        
+        
     }
 
     #[cfg(all(test, feature = "e2e-tests"))]
@@ -287,7 +319,7 @@ mod loyalty_marketplace {
             // When: Create a listing
             let mut call_builder = contract.call_builder::<LoyaltyMarketplace>();
             
-            let call = call_builder.create_listing(1, 1000, "http://token-uri.com".into());
+            let call = call_builder.create_listing(1, 1000, "http://token-uri.com".into(),"Calvalry".into());
         
             // Then: Ensure the listing is created successfully
             let result = client
@@ -314,7 +346,7 @@ mod loyalty_marketplace {
             assert_eq!(listing.price, 1000, "The listing price should be 1000");
             assert_eq!(listing.seller, alice_account, "The listing price should be 1000");
 
-            let call_two = call_builder.create_listing(2, 2000, "http://token-uri.com".into());
+            let call_two = call_builder.create_listing(2, 2000, "http://token-uri.com".into(),"Calvalry".into());
         
             // Then: Ensure the listing is created successfully
             let result_two = client
@@ -362,7 +394,7 @@ mod loyalty_marketplace {
             // When: Create a listing
             let mut call_builder = contract.call_builder::<LoyaltyMarketplace>();
             
-            let call = call_builder.create_listing(1, 1000, "http://token-uri.com".into());
+            let call = call_builder.create_listing(1, 1000, "http://token-uri.com".into(),"Calvalry".into());
         
             // Then: Ensure the listing is created successfully
             let result = client
@@ -413,7 +445,7 @@ mod loyalty_marketplace {
             // When: Create a listing
             let mut call_builder = contract.call_builder::<LoyaltyMarketplace>();
             
-            let call = call_builder.create_listing(1, 1000, "http://token-uri.com".into());
+            let call = call_builder.create_listing(1, 1000, "http://token-uri.com".into(),"Calvalry".into());
         
             // Then: Ensure the listing is created successfully
             let result = client
@@ -474,7 +506,7 @@ mod loyalty_marketplace {
             // When: Create a listing
             let mut call_builder = contract.call_builder::<LoyaltyMarketplace>();
             
-            let call = call_builder.create_listing(1, 10, "http://token-uri.com".into());
+            let call = call_builder.create_listing(1, 10, "http://token-uri.com".into(),"Calvalry".into());
         
             // Then: Ensure the listing is created successfully
             let result = client
@@ -500,6 +532,17 @@ mod loyalty_marketplace {
       
 
                 assert!(sale.is_ok());
+
+
+            let update_listing_call = call_builder.update_listing(1);
+            let listing_update = client
+                    .call(&ink_e2e::alice(), &update_listing_call)
+                    .submit()
+                    .await
+                    .expect("Calling `update_listing` failed")
+                    .return_value();
+
+            assert!(listing_update.is_ok());
 
 
             Ok(())

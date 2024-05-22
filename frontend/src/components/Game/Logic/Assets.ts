@@ -15,7 +15,6 @@ export interface LoyaltyAssets {
 }
 
 
-
 export class Assets {
 
     public cavalry: ArmyUnit[] = [];
@@ -46,11 +45,15 @@ export class Assets {
 
     public meshNameToIndex: Map<string, LoyaltyAssets> = new Map();
 
+    public Units: Map<number, ArmyUnit> = new Map();
+
+    public enemyUnits: Map<number, ArmyUnit> = new Map();
+
 
     public sounds: Map<string, Sound> | undefined;
 
     public pieces:Map<string,  Mesh> = new Map();
-
+    public piecesToUnit:Map<string,  ArmyUnit> = new Map();
     public piecesThreatAreas:Map<string,  Mesh> = new Map();
 
     public unitColors = [
@@ -259,7 +262,7 @@ export class Assets {
                 }
 
                 unitArray.push({
-                    unitId:1,
+                    unitId:i,
                     name: `${type} Unit ${i}`,
                     army_type: type,
                     strength: strength,
@@ -521,17 +524,136 @@ export class Assets {
         // Set the diffuse texture using a URL
         unitMaterial.diffuseTexture = unitTexture;
 
-        console.log(unitMaterial)
+        //console.log(unitMaterial)
 
         return unitMaterial
 
     }
 
+    public getUnit(key: number): ArmyUnit | undefined {
+        return this.Units.get(key);
+    }
 
-     // enemy assets
+    public getEnemyUnit(key: number): ArmyUnit | undefined {
+        return this.Units.get(key);
+    }
 
+    public getAllUnits(){
+       // console.log(this.Units)
+        return Array.from(this.Units.values());
+    }
+ 
+    public getAllEnemyUnits() {
+        //console.log(this.enemyUnits);
+        return Array.from(this.enemyUnits.values());
+    }
 
+    public getFirstFourStrength(): number {
+
+        let numberCount = 0
+
+       // console.log(this.cavalry.length)
+        const getTotalStrength = (units: ArmyUnit[]): number => {
+            let totalStrength = 0;
+            for (let i = 0; i < Math.min(4, units.length); i++) {
+                totalStrength += units[i].strength;
+                this.Units.set(numberCount,units[i])
+                numberCount ++;
+            }
+
+          
+            return totalStrength;
+        };
+
+        const cavalryStrength = getTotalStrength(this.cavalry);
+        const infantryStrength = getTotalStrength(this.infantry);
+        const archersStrength = getTotalStrength(this.archers);
+        const artilleryStrength = getTotalStrength(this.artillery);
+
+        return cavalryStrength + infantryStrength + archersStrength + artilleryStrength;
+    }
   
+    public getLastFourStrength(): number {
+
+        let numberCount = 0
+
+       // console.log(this.cavalry)
+
+        const getTotalStrength = (units: ArmyUnit[]): number => {
+            let totalStrength = 0;
+            const start = Math.max(0, units.length - 4);
+           // console.log(start)
+            for (let i = start; i < units.length; i++) {
+                totalStrength += units[i].strength;
+                this.enemyUnits.set(numberCount,units[i])
+                // console.log(this.enemyUnits.get(numberCount))
+    
+                numberCount ++;
+            }
+            return totalStrength;
+        };
+
+
+        const cavalryStrength = getTotalStrength(this.cavalry);
+        const infantryStrength = getTotalStrength(this.infantry);
+        const archersStrength = getTotalStrength(this.archers);
+        const artilleryStrength = getTotalStrength(this.artillery);
+
+        return cavalryStrength + infantryStrength + archersStrength + artilleryStrength;
+    }
+
+    public getCavalry(): ArmyUnit[] {
+        return this.cavalry;
+    }
+
+    public getInfantry(): ArmyUnit[] {
+        return this.infantry;
+    }
+
+    public getArchers(): ArmyUnit[] {
+        return this.archers;
+    }
+
+    public getArtillery(): ArmyUnit[] {
+        return this.artillery;
+    }
+
+    // Method to update the strength of a cavalry unit
+    public updateCavalryUnit(index: number, newStrength: number): boolean {
+        if (index >= 0 && index < this.cavalry.length) {
+            this.cavalry[index].strength = newStrength;
+            return true;
+        }
+        return false;
+    }
+
+    // Method to update the strength of an infantry unit
+    public updateInfantryUnit(index: number, newStrength: number): boolean {
+        if (index >= 0 && index < this.infantry.length) {
+            this.infantry[index].strength = newStrength;
+            return true;
+        }
+        return false;
+    }
+
+    // Method to update the strength of an archer unit
+    public updateArcherUnit(index: number, newStrength: number): boolean {
+        if (index >= 0 && index < this.archers.length) {
+            this.archers[index].strength = newStrength;
+            return true;
+        }
+        return false;
+    }
+
+    // Method to update the strength of an artillery unit
+    public updateArtilleryUnit(index: number, newStrength: number): boolean {
+        if (index >= 0 && index < this.artillery.length) {
+            this.artillery[index].strength = newStrength;
+            return true;
+        }
+        return false;
+    }
+
 
 }
 
