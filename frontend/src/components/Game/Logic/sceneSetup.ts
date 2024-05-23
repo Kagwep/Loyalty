@@ -145,12 +145,14 @@ export class GameScene {
         this.game = new Game(this.scene);
 
 
-        gameGUI.updatePlayerStat(0, `Total Strength: ${assets.getFirstFourStrength()}`, "purple");
-        console.log("Player strenth Total",assets.getLastFourStrength())
+        gameGUI.updatePlayerStat(0, `Total Strength: ${assets.calculateUnitsTotalStrength()}`, "purple");
+       
 
         // console.log("Player pieces",assets.pieces)
-        console.log("Player units",assets.getAllUnits())
-        console.log("Player units",assets.getAllEnemyUnits())
+
+        // console.log("pieces one",assets.getAllUnits())
+        // console.log("pieces two",assets.getAllEnemyUnits())
+        
 
 
 
@@ -313,9 +315,29 @@ export class GameScene {
             }else {
                 console.log("Reached the last point in the path.");
 
-                this.game.checkCollisions(this.assets,mesh, mesh.name);
+                const collisionResult = this.game.checkCollisions(this.assets,mesh, mesh.name);
+                
 
-      
+                if (collisionResult.collision) {
+                    
+                    console.log(collisionResult.details.current);
+
+        
+
+                    const collidedWithOpponent = this.game.isOpponent(this.assets,collisionResult.details.other)
+
+                    if (collidedWithOpponent){
+                        this.game.processEngagements(this.assets,collisionResult.details.current,collisionResult.details.other);
+                        this.gui.updatePlayerStat(0, `Total Strength: ${this.assets.calculateUnitsTotalStrength()}`, "purple");
+
+                        console.log(this.assets.calculateUnitsTotalStrength())
+                    }
+
+                } else {
+                    // Handle no collision case
+                    console.log("No collisions detected for this movement.");
+                    // Continue with normal game flow
+                }
 
 
 
