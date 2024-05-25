@@ -85,7 +85,7 @@ export class GUI {
         rightPanel.verticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
         this.advancedTexture.addControl(rightPanel);
 
-        const playerStats = ["Total Strength: 160", "Captured Assets: 0", "Resources: 10 Gold", "Banners: 16 NFTs"];
+        const playerStats = ["Total Strength: 0", "Captured Assets: 0", "Resources: 0 Gold", "Banners: 16 "];
         playerStats.forEach((stat, index) => {
             const container = new Rectangle();
             container.width = "100%";
@@ -105,7 +105,7 @@ export class GUI {
         });
 
         // Similar panel for opponent's stats
-        const opponentStats = ["Opponent Strength: 9876", "Captured Assets: 3", "Resources: 800 Gold"];
+        const opponentStats = ["Opponent Strength: 0", "Captured Assets: 0", "Resources: 0 Gold"];
         opponentStats.forEach((stat, index) => {
             const container = new Rectangle();
             container.width = "100%";
@@ -239,11 +239,17 @@ export class GUI {
         });
     }
 
+    
+
     // Method to update player stats
     updatePlayerStat(index: number, newValue: string, color: string = "white") {
+        
         if (index >= 0 && index < this.playerStatsTextBlocks.length) {
             this.playerStatsTextBlocks[index].text = newValue;
             this.playerStatsTextBlocks[index].color = color;
+
+            console.log("player update")
+            console.log(newValue)
         }
     }
 

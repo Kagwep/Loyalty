@@ -432,7 +432,7 @@ export class Assets {
         return unitArray;
     }
 
-    public setPiecesStartingPositions(player:any){
+    public setPiecesStartingPositions(player:any,opponetsTokenUris: string []){
 
         const meshesToReferenceSetOne = [
             'whitepalace', 'darkpalace', 'fortvillage', 'plains'
@@ -472,7 +472,14 @@ export class Assets {
                         unitMaterial.diffuseColor = new Color3(Math.random(), Math.random(), Math.random()); // Random color for example
                         piece.material = unitMaterial;
 
-                        const discPos = -15;
+                        let discPos;
+
+                        if(player.identity === 'player_one'){
+                            discPos = -15;
+                        }else{
+                            discPos = 15;
+                        }
+                       
 
                         const pieceThreatArea = this.createAndParentThreatArea(this.scene, piece, 3, this.unitColors[i % this.unitColors.length], this.specialUnits.includes(unit),discPos);
 
@@ -502,15 +509,73 @@ export class Assets {
                         redMaterial.diffuseColor = new Color3(1, 0, 0); // Red color
                         piece.material = redMaterial;
 
-                        const discPos = 15;
+                        let discPos;
 
+                        if(player.identity === 'player_one'){
+                            discPos = 15;
+                        }else{
+                            discPos = -15;
+                        }
+
+                        
                         const pieceThreatArea = this.createAndParentThreatArea(this.scene, piece, 3, { r: 1, g: 0, b: 0 }, this.specialUnits.includes(unit),discPos);
 
                         this.piecesThreatAreas.set(meshName,pieceThreatArea);
 
+
+
                         const currentUnits = this.UnitType(unit)
 
                         const currentUnit = currentUnits[i-1];
+
+                        switch (unit.toLocaleLowerCase()) {
+                            case "cavalry":
+                                const cavalryMaterial = this.setTokenUriToEnemyUnit(unit.toLocaleLowerCase(),opponetsTokenUris);
+                                currentUnit.model.getChildMeshes(false, (node) => {
+                                    if (node instanceof Mesh) {
+                                        node.material = cavalryMaterial;
+                                        return true;  
+                                    }
+                                    return false;  
+                                });
+                                break;
+            
+                            case "infantry":
+                                const infantryMaterial = this.setTokenUriToEnemyUnit(unit.toLocaleLowerCase(),opponetsTokenUris);
+                                currentUnit.model.getChildMeshes(false, (node) => {
+                                    if (node instanceof Mesh) {
+                                        node.material = infantryMaterial;
+                                        return true;  
+                                    }
+                                    return false;  
+                                });
+                                break;
+            
+                            case "archers":
+                                const archersMaterial = this.setTokenUriToEnemyUnit(unit.toLocaleLowerCase(),opponetsTokenUris);
+                                currentUnit.model.getChildMeshes(false, (node) => {
+                                    if (node instanceof Mesh) {
+                                        node.material = archersMaterial;
+                                        return true;  
+                                    }
+                                    return false;  
+                                });
+                                break;
+            
+                            case "artillery":
+                                const artilleryMaterial = this.setTokenUriToEnemyUnit(unit.toLocaleLowerCase(),opponetsTokenUris);
+                                currentUnit.model.getChildMeshes(false, (node) => {
+                                    if (node instanceof Mesh) {
+                                        node.material = artilleryMaterial;
+                                        return true;  
+                                    }
+                                    return false;  
+                                });
+                                break;
+            
+                            default:
+                                console.error("Unknown asset key:", unit.toLocaleLowerCase());
+                        }
 
                         this.piecesToEnemyUnit.set(meshName,currentUnit)
                         
@@ -549,6 +614,45 @@ export class Assets {
                 break;
             case "artillery":
                 textureUri =  this.token_uris[3];
+                break;
+            default:
+                console.error("Unknown asset key:", pieceName);
+        }
+
+        const unitTexture = new Texture(`${textureUri}`, this.scene);
+
+        unitTexture.vScale = -1;
+        unitTexture.uScale = -2;
+
+        // Set the diffuse texture using a URL
+        unitMaterial.diffuseTexture = unitTexture;
+
+        //console.log(unitMaterial)
+
+        return unitMaterial
+
+    }
+
+
+    public setTokenUriToEnemyUnit(pieceName:string,enemyTokenUris:string[]): StandardMaterial {
+
+        const unitMaterial = new StandardMaterial(`${pieceName}`, this.scene);
+
+        let textureUri:string = '';
+
+        switch (pieceName) {
+            case "cavalry":
+                 textureUri =  enemyTokenUris[0];
+                break;
+
+            case "infantry":
+                textureUri =  enemyTokenUris[1];
+                break;
+            case "archers":
+                textureUri =  enemyTokenUris[2];
+                break;
+            case "artillery":
+                textureUri =  enemyTokenUris[3];
                 break;
             default:
                 console.error("Unknown asset key:", pieceName);
@@ -632,62 +736,10 @@ export class Assets {
      }
 
 
+     public setTokenUrisEnemy(tokenUris: string []){
+
+     }
+
+
 
 }
-
-
-
-
-// import { AbstractMesh, Scene, SceneLoader,Sound } from "@babylonjs/core";
-
-// interface ArmyUnit {
-//     name: string,
-//     army_type: string,
-//     strength: number,
-//     model: AbstractMesh
-// }
-
-// export class Assets {
-//     public cavalry: ArmyUnit[] = [];
-//     public infantry: ArmyUnit[] = [];
-//     public archers: ArmyUnit[] = [];
-//     public artillery: ArmyUnit[] = [];
-//     private cavalry_model: AbstractMesh[] | undefined;
-//     private infantry_model: AbstractMesh[] | undefined;
-//     private archers_model: AbstractMesh[] | undefined;
-//     private artillery_model: AbstractMesh[] | undefined;
-
-//     constructor(scene: Scene) {
-//         // Constructor remains synchronous
-//     }
-
-//     async initialize() {
-//         this.cavalry_model = await this.loadAsset("cavalry.glb");
-//         this.infantry_model = await this.loadAsset("infantry.glb");
-//         this.archers_model = await this.loadAsset("archers.glb");
-//         this.artillery_model = await this.loadAsset("artillery.glb");
-
-//         this.createUnits(this.cavalry_model, this.cavalry, "Cavalry", 4);
-//         this.createUnits(this.infantry_model, this.infantry, "Infantry", 3);
-//         this.createUnits(this.archers_model, this.archers, "Archers", 2);
-//         this.createUnits(this.artillery_model, this.artillery, "Artillery", 1);
-//     }
-
-//     private async loadAsset(model_name: string): Promise<AbstractMesh[]> {
-//         const { meshes } = await SceneLoader.ImportMeshAsync('', './models/', model_name);
-//         return meshes;
-//     }
-
-//     private createUnits(modelArray: AbstractMesh[] | undefined, unitArray: ArmyUnit[], type: string, strength: number) {
-//         if (modelArray && modelArray.length > 0) {
-//             for (let i = 1; i <= 8; i++) {
-//                 unitArray.push({
-//                     name: `${type} Unit ${i}`,
-//                     army_type: type,
-//                     strength: strength,
-//                     model: modelArray[0].clone(`${type}Unit${i}`, null, true) as AbstractMesh
-//                 });
-//             }
-//         }
-//     }
-// }

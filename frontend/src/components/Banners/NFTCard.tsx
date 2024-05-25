@@ -1,10 +1,74 @@
-import React from 'react'
+import React,{useState} from 'react'
 import { FaCoins } from 'react-icons/fa'
+import { encodeAddress } from "@polkadot/util-crypto"
+import {
+  SubstrateWalletPlatform,
+  allSubstrateWallets,
+  isWalletInstalled,
+  useInkathon,
+  contractQuery,
+  decodeOutput,
+  useRegisteredContract,
+} from "@scio-labs/use-inkathon"
+import { ContractIds } from "@/deployments/loyalty_marketplace/deployments";
+import toast from 'react-hot-toast';
+import { motion } from 'framer-motion'
+import { contractTxWithToast } from '@/utils/contract-tx-with-toast'
+
+function NFTCard({ tokenId,img, title, price }:{ tokenId:string,img:string, title:string, price:string }) {
+
+  const {
+    activeChain,
+    connect,
+    disconnect,
+    activeAccount,
+    accounts,
+    setActiveAccount,
+    api,
+    isConnected,
+    activeSigner 
+  } = useInkathon()
 
 
-function NFTCard({ img, title, price }:{ img:string, title:string, price:string }) {
+  const [fetchIsLoading, setFetchIsLoading] = useState<boolean>()
 
+  const { contract } = useRegisteredContract(ContractIds.Marketplace);
 
+  const executeSale = async (tokenId: string,price: string) => {
+
+    // console.log(contract)
+    if (!contract || !api) return
+
+    if (!activeAccount || !contract || !activeSigner || !api) {
+      toast.error('Wallet not connected. Try again…', {
+          style: {
+              color: '#000', // White text color
+              fontSize:10
+          }
+        })
+      return
+    }
+
+    const newtokenId = tokenId.toString().replace(/,/g, '');
+    const newprice = Number(price)
+
+    console.log(newtokenId)
+
+    try {
+      let response = await contractTxWithToast(api, activeAccount.address, contract, 'execute_sale', {value:newprice}, [newtokenId])
+
+      const { dryResult, result: responseResult, ...rest } = response;
+
+      if (dryResult.result.isOk) {
+          
+      } 
+      
+    } catch (e) {
+      console.error(e)
+    } finally {
+      setFetchIsLoading(false)
+    }
+  }
 
   return (
     <>
@@ -29,7 +93,7 @@ function NFTCard({ img, title, price }:{ img:string, title:string, price:string 
         </div>
         {/* Hover */}
         <div className='absolute hidden top-1/4 left-1/3 md:left-1/4 group-hover:flex animate-bounce transition-all ease-in-out duration-1000'>
-          <button className='text-sm px-6 py-2 bg-indigo-600 rounded-md hover:bg-indigo-700 duration-200 ease-in-out'>
+          <button className='text-sm px-6 py-2 bg-indigo-600 rounded-md hover:bg-indigo-700 duration-200 ease-in-out' onClick={() => executeSale(tokenId,price)}>
             Buy
           </button>
         </div>

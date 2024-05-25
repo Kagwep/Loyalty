@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import NFTCardHome from './NFTCardHome'
+import BannersNFTCardHome from './SetBannersCard'
 import nfts from '@/data/nfts'
 import { motion } from 'framer-motion'
 import {
@@ -12,7 +12,7 @@ import { p } from 'node_modules/@scio-labs/use-inkathon/dist/getPSP22Balances-cJ
 import { encodeAddress } from '@polkadot/util-crypto'
 import { truncateHash } from '@/utils/truncate-hash'
 
-function NFTGrid({banners}:{banners:any}) {
+function BannerNFTGrid({banners, handleSetBanner}:{banners:any, handleSetBanner:(bannerUrl:string) => void}) {
   const parentVariants = {
     hidden: {
       x: -100,
@@ -73,12 +73,11 @@ function NFTGrid({banners}:{banners:any}) {
       {activeAccount ? (
         <>
           {filteredBanners.map((banner, idx) => (
-              <NFTCardHome
+              <BannersNFTCardHome
               img={banner.tokenUri}
               title={banner.title}
               price={banner.price}
-              index={banner.id}
-              currentlyListed={banner.currentlyListed}
+              handleSetBanner={handleSetBanner}
             />
           ))}
         </>
@@ -90,4 +89,4 @@ function NFTGrid({banners}:{banners:any}) {
   
 }
 
-export default NFTGrid
+export default BannerNFTGrid

@@ -5,6 +5,13 @@ import { Assets } from './Assets';
 import { GUI } from './GUI';
 import { Game } from './Game';
 import { ArmyUnit } from './Assets';
+import socket from '@/socket';
+import { playerT } from './GameState';
+
+interface Move {
+    selectedPieceName:string;
+    selectedPoint:Vector3;
+  }
 
 export class GameScene {
     private scene: Scene;
@@ -21,14 +28,23 @@ export class GameScene {
     public  opponentColors = ["red", "red", "red"];
     private gui: GUI;
     private units = ["Cavalry", "Infantry", "Archers", "Artillery"];
+    public playerIdentity:string;
+    public opponnetTokenUris:string [] = [];
+    public playerTurn = "player_one"
+    public room:string;
 
 
-    constructor(canvasElement:  HTMLCanvasElement) {
+    constructor(canvasElement:  HTMLCanvasElement,tokenUris: string[], opponentTokenUris: string [], playerIdentity:string,room:string) {
 
         this.canvas = canvasElement;
         this.engine = new Engine(this.canvas, true);
         this.scene = new Scene(this.engine);
+        this. unitTokenUris = tokenUris;
+        this.opponnetTokenUris = opponentTokenUris;
+        this.room = room;
         
+
+        this.playerIdentity = playerIdentity;
 
         this.initRecast().then(() => {
             this.createCamera();
@@ -37,6 +53,19 @@ export class GameScene {
             this.addListeners();
         });
 
+        this.initializeSocketListeners();
+
+    }
+
+    private initializeSocketListeners() {
+        socket.on('turnChange', (turnChange) => {
+            console.log("It's now the opponent's turn.");
+            this.playerTurn = this.playerTurn === 'player_one' ? 'player_two' : 'player_one'
+        });
+
+        socket.on("move", (move) => {
+            this.handleopponentMove(move);
+          });
     }
 
     private async initRecast(): Promise<void> {
@@ -61,13 +90,7 @@ export class GameScene {
         let unitpositionZ = 0;
         let unitpositionX = 0;
 
-        this. unitTokenUris = [
-            'https://hambre.infura-ipfs.io/ipfs/QmWjuQ5fitcQzmvJ2zYbg9Ey8arMCAkwbzaofhRKr7ewSM',
-            'https://hambre.infura-ipfs.io/ipfs/QmZoczszkuFaxjufK9yKPdA6JPsw6nyeM46ghmMW1htLvi',
-            'https://hambre.infura-ipfs.io/ipfs/QmYJaPth7s83t3URg4PM9SUFAqBrrKMTzSWa3xchDcEjT4',
-            'https://hambre.infura-ipfs.io/ipfs/QmW1EP1AkVZ82GfeKsY9b1211w5a5nhXMSAGQUU6JsbY6E'
-        ]
-
+        
         const gameGUI = new GUI(this.scene, this.unitTokenUris, this.playerColors, this.opponentColors);
         this.gui = gameGUI;
 
@@ -138,7 +161,9 @@ export class GameScene {
             assets.setAssetsMeshNameToIndex(meshes);
         }
 
-        assets.setPiecesStartingPositions({identity:'player_one'});
+        const opponetsTokenUris = this.opponnetTokenUris;
+
+        assets.setPiecesStartingPositions({identity:this.playerIdentity },opponetsTokenUris);
 
         assets.cavalry[0].model.isPickable = false;
 
@@ -223,6 +248,30 @@ export class GameScene {
         }
     }
 
+    private incrementLastChar(str) {
+        // Get the last character
+        const lastChar = str.charAt(str.length - 1);
+        
+        let incrementedNumber = parseInt(lastChar) + 4; // Increment the number by 4
+
+        const newStr = str.slice(0, -1) + incrementedNumber;
+    
+        return newStr;
+    }
+
+    private handleopponentMove = (move:Move) => {
+
+        if (this.playerIdentity !== this.playerTurn) {
+            const newSelectedMeshName = this.incrementLastChar(move.selectedPieceName);
+            this.selectedMesh = this.assets.pieces.get(newSelectedMeshName);
+            const newTargetPosition  = new Vector3(move.selectedPoint._x, move.selectedPoint._y, move.selectedPoint._z);
+            this.opponentNavigateMeshToPosition(newTargetPosition);
+        }
+
+
+
+    } 
+
     private  parseMeshName(meshName: string): { unitType: string | null, unitNumber: number | null } {
         for (let unit of this.units) {
             const regex = new RegExp(`${unit}\\D*(\\d+)`, 'i');
@@ -263,47 +312,89 @@ export class GameScene {
         return unitArray[unitNumber-1];
     }
 
+    public checkWinCondition(): number {
+        const myUnitsStrength = this.assets.calculateUnitsTotalStrength();
+        const enemyUnitsStrength = this.assets.calculateEnemyUnitsTotalStrength();
+    
+        if (myUnitsStrength <= 0 && enemyUnitsStrength > 0) {
+            return 2; // Loss: Player's units are zero and enemy units are above zero.
+        } else if (enemyUnitsStrength <= 0 && myUnitsStrength > 0) {
+            return 1; // Win: Enemy units are zero and player's units are above zero.
+        } else if (myUnitsStrength <= 0 && enemyUnitsStrength <= 0) {
+            return 0; // Draw: Both sides have units zero or below.
+        } else {
+            return 0; // Continue the game as no sides have lost yet, can be considered a draw state.
+        }
+    }
+    
+
     private addListeners(): void {
         this.scene.onPointerDown = (evt, pickResult) => {
+
+            console.log("player turn", this.playerTurn)
+
             //console.log(pickResult.pickedMesh);
-            if (pickResult.hit && pickResult.pickedMesh &&  this.assets.pieces.has(pickResult.pickedMesh.name)) {
-                this.selectedMesh = pickResult.pickedMesh as Mesh;
-                const { unitType, unitNumber } = this.parseMeshName(pickResult.pickedMesh.name);
+            if (pickResult.hit && pickResult.pickedMesh &&  (this.assets.pieces.has(pickResult.pickedMesh.name)  && this.playerTurn === this.playerIdentity)) {
 
-                const activeUnit = this.findUnit.call(this, unitType, unitNumber);
-
-                console.log(activeUnit);
-
-                this.gui.updateActiveUnit(activeUnit);
-            } else if (pickResult.hit && pickResult.pickedMesh === this.navMesh && this.selectedMesh) {
-                //console.log(pickResult.pickedPoint!)
+                let isplayerPiece: boolean = this.assets.piecesToUnit.has(pickResult.pickedMesh.name) ? true : false;
+                
+                if(isplayerPiece){
+                    this.selectedMesh = pickResult.pickedMesh as Mesh;
+                    const { unitType, unitNumber } = this.parseMeshName(pickResult.pickedMesh.name);
+    
+                    const activeUnit = this.findUnit.call(this, unitType, unitNumber);
+    
+                    console.log(activeUnit);
+    
+                    this.gui.updateActiveUnit(activeUnit);
+                }
+                  
+            } else if (pickResult.hit && pickResult.pickedMesh === this.navMesh && this.selectedMesh && (this.playerTurn === this.playerIdentity)) {
+                console.log(pickResult.pickedPoint!)
                 this.navigateMeshToPosition(pickResult.pickedPoint!);
-
+                const move: Move = {
+                    selectedPieceName:this.selectedMesh.name,
+                    selectedPoint:pickResult.pickedPoint,
+                  };
+                  socket.emit("move", { // <- 3 emit a move event.
+                    move,
+                    room:this.room,
+                  }); // this event will be transmitted to the opponent via the server
 
             }
         };
     }
 
-        private navigateMeshToPosition(targetPosition: Vector3): void {
-           // console.log(this.selectedMesh)
-            if (!this.selectedMesh) return;
-        
-            // Synchronously compute the path
-            const path: Vector3[] = this.navigation.computePath(this.selectedMesh.position, targetPosition);
-        
-            // Check if a valid path was returned and animate the mesh along this path
-            if (path && path.length > 0) {
-                
-                this.animateMeshAlongPath(this.selectedMesh, path);
-            }
-        }
-        
-        
-    
+    private opponentNavigateMeshToPosition(targetPosition: Vector3): void {
+        // console.log(this.selectedMesh)
+         if (!this.selectedMesh) return;
 
-    private animateMeshAlongPath(mesh: Mesh, path: Vector3[]): void {
+         console.log(this.selectedMesh.position, targetPosition)
+     
+         // Synchronously compute the path
+         const path: Vector3[] = this.navigation.computePath(this.selectedMesh.position, targetPosition);
+
+         console.log("reached here")
+
+         console.log(path)
+     
+         // Check if a valid path was returned and animate the mesh along this path
+         if (path && path.length > 0) {
+
+             console.log("also reached here")
+             
+             this.opponentAnimateMeshAlongPath(this.selectedMesh, path);
+         }
+     }
+
+
+     private opponentAnimateMeshAlongPath(mesh: Mesh, path: Vector3[]): void {
         let currentPointIndex = 0;
         mesh.position = path[currentPointIndex]; // Start position
+
+        console.log(currentPointIndex)
+
+        let energyUsed = 0
         
 
         const goToNextPoint = () => {
@@ -312,8 +403,121 @@ export class GameScene {
                 Animation.CreateAndStartAnimation('moveToPoint', mesh, 'position', 30, 60, mesh.position, path[currentPointIndex], Animation.ANIMATIONLOOPMODE_CONSTANT, undefined, () => {
                     goToNextPoint();
                 });
+                energyUsed += 0.001;
             }else {
                 console.log("Reached the last point in the path.");
+
+                if (this.assets.piecesToUnit.has(mesh.name)) {
+                    const unit = this.assets.piecesToUnit.get(mesh.name)
+                    this.assets.piecesToUnit.set(mesh.name, unit);
+                } else if (this.assets.piecesToEnemyUnit.has(mesh.name)) {
+                    const unit = this.assets.piecesToEnemyUnit.get(mesh.name)
+                    this.assets.piecesToEnemyUnit.set(mesh.name, unit);
+                } else {
+                    console.log("Piece name not found in any map");
+                }
+
+                const collisionResult = this.game.checkCollisions(this.assets,mesh, mesh.name);
+                
+
+                if (collisionResult.collision) {
+                    
+                    console.log(collisionResult.details.current);
+
+        
+
+                    const collidedWithOpponent = this.game.isOpponent(this.assets,collisionResult.details.other)
+
+                    if (collidedWithOpponent){
+                        this.game.processEngagements(this.assets,collisionResult.details.current,collisionResult.details.other);
+                        this.gui.updatePlayerStat(0, `Total Strength: ${this.assets.calculateUnitsTotalStrength()}`, "purple");
+
+                        console.log(this.assets.calculateUnitsTotalStrength())
+                    }
+
+                } else {
+                    // Handle no collision case
+                    console.log("No collisions detected for this movement.");
+                    // Continue with normal game flow
+                    this.selectedMesh = null;
+                }
+            }
+        };
+
+        goToNextPoint();
+
+        const winLossDraw = this.checkWinCondition()
+
+        if (winLossDraw === 1){
+
+        }else if(winLossDraw === 0){
+
+        }else{
+            
+        }
+        
+    }
+
+
+        private navigateMeshToPosition(targetPosition: Vector3): void {
+           // console.log(this.selectedMesh)
+            if (!this.selectedMesh) return;
+
+            console.log(this.selectedMesh.position, targetPosition)
+        
+            // Synchronously compute the path
+            const path: Vector3[] = this.navigation.computePath(this.selectedMesh.position, targetPosition);
+
+            console.log("reached here")
+
+            console.log(path)
+        
+            // Check if a valid path was returned and animate the mesh along this path
+            if (path && path.length > 0) {
+
+                console.log("also reached here")
+                
+                this.animateMeshAlongPath(this.selectedMesh, path);
+            }
+        }
+        
+        private endTurn() {
+            const newTurnData = {
+              room: this.room,        // The room ID where this game is taking place
+              turnChange: true,  // Additional data indicating the nature of the turn change
+            };
+            socket.emit('turnChange', newTurnData);
+          }
+    
+
+    private animateMeshAlongPath(mesh: Mesh, path: Vector3[]): void {
+        let currentPointIndex = 0;
+        mesh.position = path[currentPointIndex]; // Start position
+
+        console.log(currentPointIndex)
+
+        let energyUsed = 0
+        
+
+        const goToNextPoint = () => {
+            currentPointIndex++;
+            if (currentPointIndex < path.length) {
+                Animation.CreateAndStartAnimation('moveToPoint', mesh, 'position', 30, 60, mesh.position, path[currentPointIndex], Animation.ANIMATIONLOOPMODE_CONSTANT, undefined, () => {
+                    goToNextPoint();
+                });
+                energyUsed += 0.001;
+            }else {
+                console.log("Reached the last point in the path.");
+
+                if (this.assets.piecesToUnit.has(mesh.name)) {
+                    const unit = this.assets.piecesToUnit.get(mesh.name)
+                    this.assets.piecesToUnit.set(mesh.name, unit);
+                } else if (this.assets.piecesToEnemyUnit.has(mesh.name)) {
+                    const unit = this.assets.piecesToEnemyUnit.get(mesh.name)
+                    this.assets.piecesToEnemyUnit.set(mesh.name, unit);
+                } else {
+                    console.log("Piece name not found in any map");
+                }
 
                 const collisionResult = this.game.checkCollisions(this.assets,mesh, mesh.name);
                 
@@ -339,12 +543,24 @@ export class GameScene {
                     // Continue with normal game flow
                 }
 
+                this.playerTurn = this.playerTurn === 'player_one' ? 'player_two' : 'player_one'
 
-
+                this.endTurn();
             }
         };
 
         goToNextPoint();
+
+        const winLossDraw = this.checkWinCondition()
+
+        if (winLossDraw === 1){
+
+        }else if(winLossDraw === 0){
+
+        }else{
+            
+        }
+        
     }
 
 

@@ -14,7 +14,6 @@ import {
   parentVariants,
   childVariants,
 } from '../../animations/banners'
-import { Player } from '../LeaderBoard';
 import React,{useState,useEffect,useCallback} from 'react';
 import { AiOutlineClockCircle, AiFillHeart } from 'react-icons/ai'
 
@@ -41,12 +40,7 @@ const ProfilesPage = () => {
     bio: 'Musa',
   }
 
-  const samplePlayer: Player = {
-    id: 1,
-    name: "John Doe",
-    points: 120,
-    avatarUrl: "https://example.com/avatar.jpg"
-};
+
 
 const [banners, setBanners] = useState([]);
 const [fetchIsLoading, setFetchIsLoading] = useState<boolean>()
@@ -108,7 +102,7 @@ useEffect(() => {
           <section className='p-4 pb-24 text-white'>
                 <div className='container max-w-screen-lg mx-auto overflow-hidden'>
                   <div className='flex flex-col items-center space-y-8'>
-                     <PlayerProfile player={samplePlayer} fetchBanners={fetchBaners}/>
+                    <PlayerProfile fetchBanners={fetchBaners}/>
                     <motion.div
                       variants={parentNFTVariants}
                       initial='hidden'
@@ -116,9 +110,11 @@ useEffect(() => {
                       viewport={{ once: true }}
                       className='grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-8'
                     >
-                      {/* Card 1 */}
-                      <NFTGrid  banners={banners}/>
-
+                      {banners.length > 0 ? (
+                        <NFTGrid banners={banners} />
+                      ) : (
+                        <div>Loading...</div>
+                      )}
                     </motion.div>
           
                 </div>

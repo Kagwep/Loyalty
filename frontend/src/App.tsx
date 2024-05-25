@@ -11,6 +11,7 @@ import ProfilesPage from './components/Pages/ProfilePages';
 import MarketplacePage from './components/Pages/MarketplacePage';
 import BattleRoomPage from './components/Pages/BattleRoomPage';
 import LeaderBoardPage from './components/Pages/LeaderBoardPage';
+import HowToPlayPage from "./components/Pages/HowToPlayPage"
 import { Content } from "@radix-ui/react-dropdown-menu"
 
 
@@ -34,6 +35,7 @@ function App() {
           <Route path="/marketplace" element={<MarketplacePage />} />
           <Route path="/battle-room" element={<BattleRoomPage />} />
           <Route path="/leader-board" element={<LeaderBoardPage />} />
+          <Route path="/how-to-play" element={<HowToPlayPage />} />
         </Routes>
       </>
 

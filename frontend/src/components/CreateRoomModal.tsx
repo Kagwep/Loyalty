@@ -13,6 +13,7 @@ import toast from 'react-hot-toast';
 import { contractTxWithToast } from '@/utils/contract-tx-with-toast'
 import { Players } from '@/utils/commonGame';
 import socket from '@/socket';
+import { v4 as uuidv4 } from 'uuid';
 
 interface Props {
     isOpen: boolean;
@@ -22,9 +23,10 @@ interface Props {
     setOrientation:React.Dispatch<React.SetStateAction<string>>;
     setPlayers:React.Dispatch<React.SetStateAction<Players[]>>;
     setPlayersIdentity:React.Dispatch<React.SetStateAction<string>>;
+    banners: string []
 }
 
-const CreateRoomModal: React.FC<Props> = ({ isOpen, onClose,fetchRooms,setRoom, setOrientation, setPlayers,setPlayersIdentity }) => {
+const CreateRoomModal: React.FC<Props> = ({ isOpen, onClose,fetchRooms,setRoom, setOrientation, setPlayers,setPlayersIdentity,banners }) => {
 
     const {
         activeChain,
@@ -54,22 +56,21 @@ const CreateRoomModal: React.FC<Props> = ({ isOpen, onClose,fetchRooms,setRoom, 
        // console.log("gfffg",activeAccount)
        }
        
-    const handleCreateRoom = () => {
-        socket.emit("createRoom", (r: React.SetStateAction<string>) => {
-          console.log(r);
-          setRoom(r);
-          setOrientation("white");
-          setPlayersIdentity('player-1')
-    
+   const handleCreateRoom = (roomId) => {
+        socket.emit("createRoom", roomId,banners, (response) => {
+            console.log(response);
+            setRoom(response.roomId); // Assuming the server echoes back the roomId
+            setOrientation("white");
+            setPlayersIdentity('player_one');
         });
-      };
+    };
+    
 
     const [formData, setFormData] = useState({
         name: '',
         status: '',
         maxPlayers: 0,
         description: '',
-        roomId: '',
         creatorName: '',
     });
 
@@ -104,15 +105,19 @@ const CreateRoomModal: React.FC<Props> = ({ isOpen, onClose,fetchRooms,setRoom, 
             return
           }
 
+          const roomId = uuidv4();
+
+          //handleCreateRoom(roomId)
+
           try {
             let response = await contractTxWithToast(api, activeAccount.address, contract, 'createRoom', {}, [
-                formData.name,formData.status,parseInt(formData.maxPlayers.toString()),formData.description,formData.roomId,formData.creatorName
+                formData.name,formData.status,parseInt(formData.maxPlayers.toString()),formData.description,roomId,formData.creatorName
             ])
 
             const { dryResult, result: responseResult, ...rest } = response;
 
             if (dryResult.result.isOk) {
-                handleCreateRoom()
+                handleCreateRoom(roomId)
             } 
             
           } catch (e) {
@@ -146,7 +151,6 @@ const CreateRoomModal: React.FC<Props> = ({ isOpen, onClose,fetchRooms,setRoom, 
                                         <input type="text" name="status" placeholder="Status" value={formData.status} onChange={handleChange} className="w-full px-3 py-2 border border-gray-300 rounded shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-2xl" />
                                         <input type="number" name="maxPlayers" placeholder="Max Players" value={formData.maxPlayers} onChange={handleChange} className="w-full px-3 py-2 border border-gray-300 rounded shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-2xl" />
                                         <input type="text" name="description" placeholder="Description" value={formData.description} onChange={handleChange} className="w-full px-3 py-2 border border-gray-300 rounded shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-2xl" />
-                                        <input type="text" name="roomId" placeholder="Room ID" value={formData.roomId} onChange={handleChange} className="w-full px-3 py-2 border border-gray-300 rounded shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-2xl" />
                                         <input type="text" name="creatorName" placeholder="Creator Name" value={formData.creatorName} onChange={handleChange} className="w-full px-3 py-2 border border-gray-300 rounded shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-2xl" />
                                     </form>
                                 </div>

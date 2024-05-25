@@ -10,10 +10,12 @@ export interface CanvasProps {
   cleanup?:() => void;
   username:string;
   player_identity:string;
+  tokenUris: string[];
+  opponentTokenUris: string [];
 }
 
 
-const Canvas:React.FC<CanvasProps> = ({ players, room,username,player_identity,cleanup }) => {
+const Canvas:React.FC<CanvasProps> = ({ players, room,username,player_identity,cleanup,tokenUris,opponentTokenUris}) => {
 
   console.log(players)
 
@@ -24,7 +26,7 @@ const Canvas:React.FC<CanvasProps> = ({ players, room,username,player_identity,c
         console.log('useEffect called');
         if (canvasRef.current) {
             console.log('Canvas element found');
-            const game = new GameScene(canvasRef.current);
+            const game = new GameScene(canvasRef.current,tokenUris,opponentTokenUris,player_identity,room);
             game.renderLoop();
         } else {
             console.log('Canvas element not found');

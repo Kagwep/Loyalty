@@ -85,7 +85,7 @@ function NFTCardsList() {
       // console.log('Result from typed contract: ', typedResult.value)
     } catch (e) {
       console.error(e)
-      toast.error('Error while fetching Rooms. Try again…', {
+      toast.error('Error while fetching Banners. Try again…', {
         style: {
             color: '#000', // White text color
             fontSize:10
@@ -109,6 +109,7 @@ function NFTCardsList() {
           <motion.div variants={childVariants} key={idx}>
             <NFTCard
               key={banner.id}
+              tokenId={banner.tokenId}
               img={banner.tokenUri}
               title={banner.title}
               price={banner.price}

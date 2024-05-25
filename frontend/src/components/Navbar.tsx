@@ -67,6 +67,11 @@ const Navbar = () => {
                             Profiles
                         </Link>
                     </li>
+                    <li>
+                        <Link to="/how-to-play"  className='nav-links'>
+                            How To Play
+                        </Link>
+                    </li>
 {/* 
                     <div className="container-sponsor-inside-nav-menu">
                         <Link to="#">
