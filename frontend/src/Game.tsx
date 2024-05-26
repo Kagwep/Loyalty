@@ -62,14 +62,13 @@ function Game() {
           </CustomDialog>
           {room ? (
             <Canvas
-              room={room}
-              orientation={orientation}
-              username={username}
-              players={players}
-              player_identity={players_identity}
-              // the cleanup function will be used by Game to reset the state when a game is over
-              cleanup={cleanup}
-            />
+            room={room}
+            orientation={orientation}
+            username={username}
+            players={players}
+            player_identity={players_identity}
+            // the cleanup function will be used by Game to reset the state when a game is over
+            cleanup={cleanup} tokenUris={[]} opponentTokenUris={[]}            />
           ) : (
             <InitGame
               setRoom={setRoom}
