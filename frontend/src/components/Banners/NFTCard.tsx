@@ -87,7 +87,7 @@ function NFTCard({ tokenId,img, title, price }:{ tokenId:string,img:string, titl
             {/* Price */}
             <div className='flex space-x-2 text-indigo-600 items-center'>
               <FaCoins size={18} />
-              <p className='text-2xl font-semibold'>{price} ROC</p>
+              <p className='text-2xl font-semibold'>{price} PAS</p>
             </div>
           </div>
         </div>

@@ -21,7 +21,7 @@ Players who rank high on the leaderboards gain the opportunity to earn proceeds 
 ## Technologies Used
 
 - **Ink! Smart Contracts**: Solid and secure smart contracts for handling game logic and transactions.
-- **Inkathon**: Framework for frontend and backend integration, ensuring a cohesive gameplay experience.
+- **use-Inkathon**: Framework for frontend and backend integration, ensuring a cohesive gameplay experience.
 - **Vite**: Frontend tooling for faster and leaner development cycles.
 - **Babylon.js**: Engine for creating immersive 3D gaming environments.
 - **Deployed on POP Network**: Ensuring wide accessibility and robust performance.
