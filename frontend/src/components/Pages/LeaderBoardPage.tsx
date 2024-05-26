@@ -13,7 +13,7 @@ const LeaderBoardPage = () => {
     <div>
     <Navbar />
       
-      <Leaderboard players={dummyPlayers}/>
+      <Leaderboard />
      
     <Footer />
 </div>
