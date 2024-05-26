@@ -3,7 +3,7 @@
 
 Welcome to Loyalty, your gateway to immersive medieval strategy gaming with a twist of modern technology. Loyalty is built on three key pillars: strategic gameplay, NFT integration, and real-time leaderboards. This README will guide you through the unique features and gameplay mechanics of Loyalty.
 
-![Loyalty Overview](https://res.cloudinary.com/dufdzujik/image/upload/v1714286395/loyalty_overview.png)
+![Loyalty Overview](https://res.cloudinary.com/dydj8hnhz/image/upload/v1716733091/v1rki3ucthyoidf5hegu.png)
 
 # Overview
 
@@ -133,4 +133,4 @@ npm install -g pnpm
 
 Loyalty is live on the POP Network testnet. Ensure you have PAS tokens for interacting with the contracts effectively.
 
-![Game Interface](https://res.cloudinary.com/dufdzujik/image/upload/v1714320837/loyalty_game_ui.png)
+![Game Interface](https://res.cloudinary.com/dydj8hnhz/image/upload/v1716721512/h9hcozdstvqtreanjq9g.png)
