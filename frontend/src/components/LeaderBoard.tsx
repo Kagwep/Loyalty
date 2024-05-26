@@ -76,7 +76,7 @@ const Leaderboard = () => {
           // console.log('Result from typed contract: ', typedResult.value)
         } catch (e) {
           console.error(e)
-          toast.error('Error while fetching Rooms. Try again…', {
+          toast.error('Error while fetching player stats. Try again…', {
             style: {
                 color: '#000', // White text color
                 fontSize:10
